@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maria Explorer · Philippine Universities</title>
+    <title>Maria Explorer · Philippine Universities (200+ HEIs)</title>
     
     <!-- Leaflet for maps (CSS) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -512,65 +512,8 @@
             overflow: hidden;
             z-index: 1;
         }
-        
-        /* ----- Course Display ----- */
-        .courses-section {
-            margin-bottom: 2rem;
-        }
-        
-        .courses-section h3 {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.3rem;
-            color: var(--text-main);
-            margin-bottom: 1rem;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 0.5rem;
-        }
-        
-        .course-category {
-            margin-bottom: 1.2rem;
-        }
-        
-        .course-category h4 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--accent-primary);
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .course-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            list-style: none;
-        }
-        
-        .course-item {
-            background: var(--bg-body);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 0.4rem 1rem;
-            font-size: 0.85rem;
-            color: var(--text-main);
-            transition: var(--transition);
-        }
-        
-        .course-item:hover {
-            background: var(--accent-primary);
-            color: white;
-            border-color: var(--accent-primary);
-        }
-        
-        .course-major {
-            font-style: italic;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-left: 0.25rem;
-        }
 
-        /* ----- States ----- */
+        /* ----- Loading States ----- */
         .state-container {
             text-align: center;
             padding: 4rem 2rem;
@@ -631,7 +574,7 @@
         <header>
             <div class="brand">
                 <h1>Maria Explorer<span>.</span></h1>
-                <p>Discover academic programs at 90+ Philippine Universities</p>
+                <p>Complete database of 200+ Philippine Higher Education Institutions</p>
             </div>
             <div class="theme-toggle">
                 <button id="lightModeBtn" class="active"><i class="fas fa-sun"></i> Light</button>
@@ -665,7 +608,7 @@
                     <button id="favoritesToggle" class="control-btn"><i class="far fa-heart"></i> Favorites</button>
                     <button id="mapToggle" class="control-btn"><i class="far fa-map"></i> Show Map</button>
                 </div>
-                <div class="stats" id="resultCount">Loading 90+ universities...</div>
+                <div class="stats" id="resultCount">Loading database...</div>
             </div>
         </div>
 
@@ -676,8 +619,8 @@
         <div id="results" class="results-grid">
             <div class="state-container">
                 <i class="fas fa-circle-notch loading-icon"></i>
-                <h3>Loading comprehensive university database...</h3>
-                <p style="color:var(--text-muted); margin-top:0.5rem;">Compiling 90+ Philippine HEIs with detailed program offerings</p>
+                <h3>Loading Philippine HEIs database...</h3>
+                <p style="color:var(--text-muted); margin-top:0.5rem;">Preparing 200+ institutions</p>
             </div>
         </div>
     </div>
@@ -717,590 +660,249 @@
             let map = null;
             let mapMarkers = [];
 
-            // ----- COMPREHENSIVE PHILIPPINE UNIVERSITIES DATABASE WITH COURSES -----
-            // Sources: CHED official records, PAASCU accreditation data [citation:3][citation:7], university websites [citation:1][citation:5][citation:10]
-            
+            // ----- COMPLETE UNIVERSITY DATABASE (200+ institutions) -----
             const PH_UNIVERSITIES = [
-                // --- NATIONAL CAPITAL REGION (NCR) - LUZON ---
-                { 
-                    name: "University of the Philippines Diliman", 
-                    domains: ["upd.edu.ph"], 
-                    web_pages: ["https://upd.edu.ph/"],
-                    courses: {
-                        "General Education": ["Arts 1", "Eng 13", "Fil 40", "Kas 1", "Math 10", "Philo 1", "SAS 1", "Soc Sci 1-3", "STS 1", "Speech 30"],
-                        "Science & Mathematics": ["Biology 11", "Chemistry 16", "Math 21", "Environmental Science 1"],
-                        "Social Sciences": ["Anthropology 100", "Economics 11", "Political Science 14", "Sociology 101"],
-                        "Philosophy": ["Philosophical Analysis", "Ethics 171", "Philosophy of Science 160"],
-                        "Physical Education": ["PE 1-2 Foundations", "Elective PE Activities"]
-                    }
-                },
-                { 
-                    name: "Ateneo de Manila University", 
-                    domains: ["ateneo.edu"], 
-                    web_pages: ["https://www.ateneo.edu/"],
-                    courses: {
-                        "School of Humanities": ["AB Humanities", "Interdisciplinary Studies (50+ tracks) [citation:2]", "Fine Arts", "Communication"],
-                        "School of Social Sciences": ["Political Science", "Economics", "Psychology", "Sociology", "History", "Japanese Studies", "Korean Studies", "Chinese Studies"],
-                        "School of Science & Engineering": ["Computer Science [citation:7]", "Information Systems [citation:7]", "Electronics Engineering", "Computer Engineering", "Mathematics", "Physics", "Biology", "Chemistry"],
-                        "Business & Management": ["Management [citation:7]", "Accounting", "Entrepreneurship", "MBA [citation:7]", "MD-MBA [citation:7]"],
-                        "Graduate Programs": ["School of Humanities (Graduate)", "School of Science & Engineering (Graduate)", "School of Social Sciences (Graduate)"],
-                        "Basic Education": ["Grade School", "High School", "Senior High School"]
-                    }
-                },
-                { 
-                    name: "De La Salle University", 
-                    domains: ["dlsu.edu.ph"], 
-                    web_pages: ["https://www.dlsu.edu.ph/"],
-                    courses: {
-                        "Business & Economics": ["Doctor of Business Administration [citation:3]", "MBA [citation:3]", "Accountancy [citation:3]", "Business [citation:3]", "Economics [citation:3]", "Entrepreneurship [citation:3]", "MS in Accountancy", "MS in Financial Engineering", "MS in Computational Finance", "MS in Marketing", "PhD in Business"],
-                        "Engineering": ["Chemical Engineering [citation:3]", "Civil Engineering [citation:3]", "Electronics Engineering [citation:3]", "Industrial Engineering [citation:3]", "Mechanical Engineering [citation:3]", "Manufacturing Engineering Management", "Computer Engineering"],
-                        "Computer Science": ["Computer Science [citation:3]", "Information Technology"],
-                        "Education": ["Elementary Education [citation:3]", "Secondary Education [citation:3]", "Graduate Programs in Education"],
-                        "Liberal Arts & Sciences": ["Liberal Arts [citation:3]", "Sciences [citation:3]", "Political Science", "Psychology", "Communication"],
-                        "Graduate Programs": ["MS Industrial Relations", "MS Management Engineering", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "University of Santo Tomas", 
-                    domains: ["ust.edu.ph"], 
-                    web_pages: ["http://www.ust.edu.ph/"],
-                    courses: {
-                        "Health Sciences": ["Medicine", "Nursing", "Pharmacy", "Medical Technology", "Physical Therapy", "Bachelor in Basic Human Studies (2-year pre-med) [citation:4]"],
-                        "Business & Economics": ["BA Economics [citation:9]", "BS Accountancy [citation:9]", "Bachelor of Accounting Information Systems [citation:9]", "BS Business Administration (Business Economics, Financial Management, HRDM, Marketing) [citation:9]", "BS Entrepreneurship [citation:9]", "BS Tourism Management [citation:9]", "MBA", "MS HR Management", "PhD Commerce", "PhD Economics"],
-                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Electrical Engineering", "Mechanical Engineering", "Electronics Engineering", "Industrial Engineering"],
-                        "Science": ["Biology", "Chemistry", "Physics", "Mathematics", "Psychology"],
-                        "Arts & Letters": ["Communication", "Journalism", "Literature", "Philosophy", "Political Science", "Sociology"],
-                        "Education": ["Elementary Education", "Secondary Education", "Physical Education"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Programs": ["MA Economics", "MA Marketing Communication", "MS Management Engineering", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "Far Eastern University", 
-                    domains: ["feu.edu.ph"], 
-                    web_pages: ["https://www.feu.edu.ph/"],
-                    courses: {
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Biology", "Mathematics"],
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
-                        "Education": ["Secondary Education", "Elementary Education"],
-                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering"],
-                        "Health Sciences": ["Nursing", "Medical Technology", "Physical Therapy", "Pharmacy"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MBA", "MPA", "MA Education", "MS Psychology"]
-                    }
-                },
-                { 
-                    name: "Polytechnic University of the Philippines", 
-                    domains: ["pup.edu.ph"], 
-                    web_pages: ["https://www.pup.edu.ph/"],
-                    courses: {
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Office Administration", "Marketing"],
-                        "Engineering": ["Civil Engineering", "Electrical Engineering", "Electronics Engineering", "Industrial Engineering", "Mechanical Engineering"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Education": ["Secondary Education", "Elementary Education", "Library Science"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Economics", "Mathematics", "Biology"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MBA", "MPA", "MA Education", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "Mapúa University", 
-                    domains: ["mapua.edu.ph"], 
-                    web_pages: ["https://www.mapua.edu.ph/"],
-                    courses: {
-                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Industrial Engineering", "Mechanical Engineering", "Manufacturing Engineering"],
-                        "Architecture": ["Architecture", "Interior Design"],
-                        "Information Technology": ["Computer Science", "Information Technology", "Entertainment Computing"],
-                        "Business": ["Business Administration", "Entrepreneurship", "Accountancy"],
-                        "Multimedia Arts": ["Digital Film", "Multimedia Arts"],
-                        "Graduate Programs": ["MS Engineering", "MBA", "PhD Engineering"]
-                    }
-                },
+                // National Capital Region (NCR)
+                { name: "University of the Philippines Diliman", domains: ["upd.edu.ph"], web_pages: ["https://upd.edu.ph/"] },
+                { name: "Ateneo de Manila University", domains: ["ateneo.edu"], web_pages: ["https://www.ateneo.edu/"] },
+                { name: "De La Salle University", domains: ["dlsu.edu.ph"], web_pages: ["https://www.dlsu.edu.ph/"] },
+                { name: "University of Santo Tomas", domains: ["ust.edu.ph"], web_pages: ["http://www.ust.edu.ph/"] },
+                { name: "Far Eastern University", domains: ["feu.edu.ph"], web_pages: ["https://www.feu.edu.ph/"] },
+                { name: "University of the East", domains: ["ue.edu.ph"], web_pages: ["https://www.ue.edu.ph/"] },
+                { name: "Adamson University", domains: ["adamson.edu.ph"], web_pages: ["https://www.adamson.edu.ph/"] },
+                { name: "Polytechnic University of the Philippines", domains: ["pup.edu.ph"], web_pages: ["https://www.pup.edu.ph/"] },
+                { name: "National University", domains: ["national-u.edu.ph"], web_pages: ["https://national-u.edu.ph/"] },
+                { name: "Mapúa University", domains: ["mapua.edu.ph"], web_pages: ["https://www.mapua.edu.ph/"] },
+                { name: "Centro Escolar University", domains: ["ceu.edu.ph"], web_pages: ["https://www.ceu.edu.ph/"] },
+                { name: "Philippine Christian University", domains: ["pcu.edu.ph"], web_pages: ["https://www.pcu.edu.ph/"] },
+                { name: "San Beda University", domains: ["sanbeda.edu.ph"], web_pages: ["https://www.sanbeda.edu.ph/"] },
+                { name: "University of Perpetual Help System DALTA", domains: ["perpetualdalta.edu.ph"], web_pages: ["https://perpetualdalta.edu.ph/"] },
+                { name: "Emilio Aguinaldo College", domains: ["eac.edu.ph"], web_pages: ["https://www.eac.edu.ph/"] },
+                { name: "Jose Rizal University", domains: ["jru.edu"], web_pages: ["https://www.jru.edu/"] },
+                { name: "Manuel L. Quezon University", domains: ["mlqu.edu.ph"], web_pages: ["https://www.mlqu.edu.ph/"] },
+                { name: "Miriam College", domains: ["mc.edu.ph"], web_pages: ["https://www.mc.edu.ph/"] },
+                { name: "New Era University", domains: ["neu.edu.ph"], web_pages: ["https://www.neu.edu.ph/"] },
+                { name: "Philippine Normal University", domains: ["pnu.edu.ph"], web_pages: ["https://www.pnu.edu.ph/"] },
+                { name: "Saint Paul University Manila", domains: ["spumanila.edu.ph"], web_pages: ["https://www.spumanila.edu.ph/"] },
+                { name: "Technological University of the Philippines", domains: ["tup.edu.ph"], web_pages: ["https://www.tup.edu.ph/"] },
+                { name: "Trinity University of Asia", domains: ["tua.edu.ph"], web_pages: ["https://www.tua.edu.ph/"] },
+                { name: "University of Asia and the Pacific", domains: ["uap.asia"], web_pages: ["https://www.uap.asia/"] },
+                { name: "University of the Philippines Manila", domains: ["upm.edu.ph"], web_pages: ["https://www.upm.edu.ph/"] },
+                { name: "Arellano University", domains: ["arellano.edu.ph"], web_pages: ["https://www.arellano.edu.ph/"] },
+                { name: "Colegio de San Juan de Letran", domains: ["letran.edu.ph"], web_pages: ["https://www.letran.edu.ph/"] },
+                { name: "San Sebastian College - Recoletos", domains: ["sscrmnl.edu.ph"], web_pages: ["https://www.sscrmnl.edu.ph/"] },
+                { name: "University of Caloocan City", domains: ["ucc.edu.ph"], web_pages: ["https://ucc.edu.ph/"] },
+                { name: "University of Makati", domains: ["umak.edu.ph"], web_pages: ["https://www.umak.edu.ph/"] },
+                { name: "University of the City of Manila", domains: ["plm.edu.ph"], web_pages: ["https://plm.edu.ph/"] },
+                { name: "Our Lady of Fatima University", domains: ["fatima.edu.ph"], web_pages: ["https://www.fatima.edu.ph/"] },
+                { name: "FEATI University", domains: ["feati.edu.ph"], web_pages: ["https://feati.edu.ph/"] },
+                { name: "Guang Ming College", domains: ["gmcollege.edu.ph"], web_pages: ["https://gmcollege.edu.ph/"] },
+                { name: "Philippine Women's University", domains: ["pwu.edu.ph"], web_pages: ["https://pwu.edu.ph/"] },
+                { name: "Saint Mary's College", domains: ["smc.edu.ph"], web_pages: ["#"] },
+                { name: "St. Paul University Quezon City", domains: ["spuqc.edu.ph"], web_pages: ["https://spuqc.edu.ph/"] },
+                { name: "St. Scholastica's College", domains: ["ssc.edu.ph"], web_pages: ["https://ssc.edu.ph/"] },
+                { name: "Technological Institute of the Philippines", domains: ["tip.edu.ph"], web_pages: ["https://www.tip.edu.ph/"] },
+                { name: "The Lewis College", domains: ["lewiscollege.edu.ph"], web_pages: ["#"] },
                 
-                // --- LUZON (North and South Luzon) ---
-                { 
-                    name: "University of the Philippines Los Baños", 
-                    domains: ["uplb.edu.ph"], 
-                    web_pages: ["https://uplb.edu.ph/"],
-                    courses: {
-                        "Agriculture": ["BS Agriculture", "Agricultural Economics", "Agribusiness Management"],
-                        "Forestry": ["BS Forestry", "Forest Products Engineering"],
-                        "Veterinary Medicine": ["Doctor of Veterinary Medicine"],
-                        "Arts & Sciences": ["Biology", "Chemistry", "Mathematics", "Physics", "Communication", "Economics", "Sociology"],
-                        "Engineering": ["Agricultural Engineering", "Chemical Engineering", "Civil Engineering"],
-                        "Environmental Science": ["BS Environmental Science", "BS Human Ecology"],
-                        "Graduate Studies": ["MS/PhD in various fields"]
-                    }
-                },
-                { 
-                    name: "Benguet State University", 
-                    domains: ["bsu.edu.ph"], 
-                    web_pages: ["https://www.bsu.edu.ph/"],
-                    courses: {
-                        "Agriculture": ["BS Agriculture", "Agricultural Technology", "Agribusiness"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Engineering": ["Civil Engineering", "Agricultural Engineering", "Mechanical Engineering"],
-                        "Information Technology": ["BSIT", "Computer Science"],
-                        "Natural Sciences": ["Biology", "Chemistry", "Mathematics"],
-                        "Social Sciences": ["Psychology", "Political Science", "Sociology"],
-                        "Graduate Studies": ["MA Education", "MS Agriculture", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "Saint Louis University", 
-                    domains: ["slu.edu.ph"], 
-                    web_pages: ["https://www.slu.edu.ph/"],
-                    courses: {
-                        "Accountancy & Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
-                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Health Sciences": ["Nursing", "Pharmacy", "Medical Technology", "Physical Therapy", "Radiologic Technology"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Biology", "Chemistry", "Mathematics"],
-                        "Education": ["BEEd", "BSEd", "BPEd"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "University of the Cordilleras", 
-                    domains: ["uc-bcf.edu.ph"], 
-                    web_pages: ["https://www.uc-bcf.edu.ph/"],
-                    courses: {
-                        "Criminal Justice": ["Criminology", "Industrial Security Management"],
-                        "Information Technology": ["Computer Science", "Information Technology", "Multimedia Arts"],
-                        "Engineering": ["Civil Engineering", "Electronics Engineering", "Computer Engineering"],
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
-                        "Teacher Education": ["BEEd", "BSEd majors"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MBA", "MPA", "MS Criminology"]
-                    }
-                },
-                { 
-                    name: "Mariano Marcos State University", 
-                    domains: ["mmsu.edu.ph"], 
-                    web_pages: ["https://www.mmsu.edu.ph/"],
-                    courses: {
-                        "Agriculture": ["BS Agriculture", "Agricultural Engineering", "Agribusiness"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Engineering": ["Civil Engineering", "Electrical Engineering", "Mechanical Engineering", "Agricultural Engineering"],
-                        "Industrial Technology": ["BS Industrial Technology majors"],
-                        "Arts & Sciences": ["Biology", "Chemistry", "Mathematics", "Physics", "Psychology", "Sociology"],
-                        "Health Sciences": ["Nursing", "Midwifery"],
-                        "Graduate Studies": ["MA/MS Programs", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "Pangasinan State University", 
-                    domains: ["psu.edu.ph"], 
-                    web_pages: ["https://www.psu.edu.ph/"],
-                    courses: {
-                        "Education": ["BEEd", "BSEd majors", "BPEd", "BTLEd"],
-                        "Engineering": ["Civil Engineering", "Electrical Engineering", "Mechanical Engineering", "Electronics Engineering"],
-                        "Information Technology": ["BSIT", "Computer Science"],
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management"],
-                        "Agriculture": ["BS Agriculture", "Fisheries"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Biology"],
-                        "Graduate Studies": ["MA/MS Programs", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "Bulacan State University", 
-                    domains: ["bulsu.edu.ph"], 
-                    web_pages: ["https://bulsu.edu.ph/"],
-                    courses: {
-                        "Engineering": ["Civil Engineering", "Electrical Engineering", "Mechanical Engineering", "Electronics Engineering", "Computer Engineering", "Industrial Engineering"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Mathematics"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "Bataan Peninsula State University", 
-                    domains: ["bpsu.edu.ph"], 
-                    web_pages: ["https://bpsu.edu.ph/"],
-                    courses: {
-                        "Abucay Campus": ["BS Agriculture (Animal/Crop Science) [citation:10]", "BTVTEd (Animal/Crops Production)", "BS Agricultural Biosystem Engineering"],
-                        "Bagac Campus": ["BEEd [citation:10]", "BS Industrial Technology (Electrical/Welding)"],
-                        "Balanga Campus": ["BSEd (English/Filipino/Social Studies) [citation:10]", "BS Public Administration", "BS Accountancy", "BS Business Administration (HRM/Marketing/Operations)", "BS Psychology", "AB Psychology"],
-                        "Dinalupihan Campus": ["BEEd", "BSEd (Math/General Science)", "Doctor of Education", "MA Education"],
-                        "Main Campus": ["BS Architecture [citation:10]", "BS Civil/Electrical/Electronics/Mechanical/Industrial Engineering", "BS Nursing", "BS Hospitality/Tourism Management", "AB Communication", "BS Midwifery", "BTVTEd (multiple tracks)", "BS Computer Science", "BSIT", "BS Entertainment Computing", "Doctor of Education", "MA Education", "MBA", "MPA", "MS Nursing"],
-                        "Orani Campus": ["BS Fisheries [citation:10]", "BTLEd Industrial Arts", "BPEd", "BS Exercise Sports Science", "MS Agriculture"]
-                    }
-                },
-                { 
-                    name: "Batangas State University", 
-                    domains: ["batstate-u.edu.ph"], 
-                    web_pages: ["https://www.batstate-u.edu.ph/"],
-                    courses: {
-                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering", "Industrial Engineering", "Computer Engineering"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Teacher Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
-                        "Science": ["Biology", "Chemistry", "Mathematics", "Physics"],
-                        "Arts & Sciences": ["Psychology", "Political Science", "Communication"],
-                        "Graduate Studies": ["MS/PhD Engineering", "MBA", "PhD Education"]
-                    }
-                },
-                { 
-                    name: "Cavite State University", 
-                    domains: ["cvsu.edu.ph"], 
-                    web_pages: ["https://www.cvsu.edu.ph/"],
-                    courses: {
-                        "Agriculture": ["BS Agriculture", "Agricultural Engineering", "Agribusiness"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Engineering": ["Civil Engineering", "Electrical Engineering", "Mechanical Engineering", "Computer Engineering"],
-                        "Information Technology": ["BSIT", "Computer Science"],
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
-                        "Health Sciences": ["Nursing", "Medical Technology"],
-                        "Veterinary Medicine": ["Doctor of Veterinary Medicine"],
-                        "Graduate Studies": ["MS/PhD Programs"]
-                    }
-                },
-                { 
-                    name: "University of Batangas", 
-                    domains: ["ub.edu.ph"], 
-                    web_pages: ["https://ub.edu.ph/"],
-                    courses: {
-                        "Engineering": ["Civil Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering", "Computer Engineering"],
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
-                        "Education": ["BEEd", "BSEd majors"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science"],
-                        "Health Sciences": ["Nursing", "Medical Technology", "Pharmacy"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MBA", "MPA", "MS Nursing", "PhD Education"]
-                    }
-                },
-                { 
-                    name: "Bicol University", 
-                    domains: ["bicol-u.edu.ph"], 
-                    web_pages: ["https://www.bicol-u.edu.ph/"],
-                    courses: {
-                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Electrical Engineering", "Mechanical Engineering"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship"],
-                        "Science": ["Biology", "Chemistry", "Mathematics", "Physics"],
-                        "Arts & Sciences": ["Psychology", "Political Science", "Sociology", "Communication"],
-                        "Health Sciences": ["Nursing", "Medical Technology", "Midwifery"],
-                        "Agriculture": ["BS Agriculture", "Fisheries"],
-                        "Veterinary Medicine": ["Doctor of Veterinary Medicine"],
-                        "Graduate Studies": ["MA/MS Programs", "PhD Programs"]
-                    }
-                },
+                // Cordillera Administrative Region (CAR)
+                { name: "University of the Philippines Baguio", domains: ["upb.edu.ph"], web_pages: ["https://upb.edu.ph/"] },
+                { name: "Benguet State University", domains: ["bsu.edu.ph"], web_pages: ["https://www.bsu.edu.ph/"] },
+                { name: "Saint Louis University", domains: ["slu.edu.ph"], web_pages: ["https://www.slu.edu.ph/"] },
+                { name: "University of the Cordilleras", domains: ["uc-bcf.edu.ph"], web_pages: ["https://www.uc-bcf.edu.ph/"] },
+                { name: "University of Baguio", domains: ["ubaguio.edu"], web_pages: ["https://ubaguio.edu/"] },
+                { name: "Baguio Central University", domains: ["bcu.edu.ph"], web_pages: ["https://bcu.edu.ph/"] },
+                { name: "Ifugao State University", domains: ["ifsu.edu.ph"], web_pages: ["https://www.ifsu.edu.ph/"] },
+                { name: "Kalinga State University", domains: ["ksu.edu.ph"], web_pages: ["https://ksu.edu.ph/"] },
+                { name: "Mountain Province State University", domains: ["mpsu.edu.ph"], web_pages: ["https://mpsu.edu.ph/"] },
+                { name: "Apayao State College", domains: ["asc.edu.ph"], web_pages: ["https://asc.edu.ph/"] },
                 
-                // --- VISAYAS ---
-                { 
-                    name: "University of San Carlos", 
-                    domains: ["usc.edu.ph"], 
-                    web_pages: ["https://www.usc.edu.ph/"],
-                    courses: {
-                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering", "Industrial Engineering"],
-                        "Architecture": ["Architecture"],
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Economics"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics", "Physics"],
-                        "Education": ["BEEd", "BSEd majors"],
-                        "Health Sciences": ["Nursing", "Pharmacy", "Medical Technology", "Physical Therapy"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MBA", "MPA", "MS/PhD Programs"]
-                    }
-                },
-                { 
-                    name: "University of the Philippines Visayas", 
-                    domains: ["upv.edu.ph"], 
-                    web_pages: ["https://www.upv.edu.ph/"],
-                    courses: {
-                        "Fisheries": ["BS Fisheries", "Fisheries Technology"],
-                        "Aquaculture": ["BS Aquaculture"],
-                        "Marine Science": ["BS Marine Biology", "Oceanography"],
-                        "Management": ["BS Management", "Business Administration"],
-                        "Arts & Sciences": ["Communication", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics"],
-                        "Graduate Studies": ["MS Fisheries", "MS Marine Science", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "Silliman University", 
-                    domains: ["su.edu.ph"], 
-                    web_pages: ["https://su.edu.ph/"],
-                    courses: {
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics", "Physics", "Philosophy"],
-                        "Business": ["Accountancy", "Business Administration", "Economics", "Hospitality Management", "Tourism Management"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electrical Engineering"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Health Sciences": ["Nursing", "Medical Technology", "Physical Therapy", "Public Health"],
-                        "Divinity": ["Bachelor of Divinity", "Ministry"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "University of St. La Salle", 
-                    domains: ["usls.edu.ph"], 
-                    web_pages: ["https://www.usls.edu.ph/"],
-                    courses: {
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Economics", "Hospitality Management"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electrical Engineering", "Industrial Engineering", "Mechanical Engineering"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Biology", "Chemistry", "Mathematics"],
-                        "Health Sciences": ["Nursing", "Medical Technology"],
-                        "Graduate Studies": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "Central Philippine University", 
-                    domains: ["cpu.edu.ph"], 
-                    web_pages: ["https://cpu.edu.ph/"],
-                    courses: {
-                        "Theology": ["Bachelor of Theology", "Divinity"],
-                        "Business": ["Accountancy", "Business Administration", "Economics", "Hospitality Management"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Computer Engineering", "Electrical Engineering", "Mechanical Engineering"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Biology", "Chemistry", "Mathematics"],
-                        "Health Sciences": ["Nursing", "Medical Technology", "Pharmacy"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MBA", "MA/MS Programs", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "University of San Jose - Recoletos", 
-                    domains: ["usjr.edu.ph"], 
-                    web_pages: ["https://usjr.edu.ph/"],
-                    courses: {
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
-                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering", "Industrial Engineering"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics"],
-                        "Health Sciences": ["Nursing", "Medical Technology", "Pharmacy"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "West Visayas State University", 
-                    domains: ["wvsu.edu.ph"], 
-                    web_pages: ["https://wvsu.edu.ph/"],
-                    courses: {
-                        "Education": ["BEEd", "BSEd majors", "BPEd", "Doctor of Education"],
-                        "Health Sciences": ["Medicine", "Nursing", "Medical Technology", "Physical Therapy", "Pharmacy"],
-                        "Business": ["Accountancy", "Business Administration", "Economics"],
-                        "Arts & Sciences": ["Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics"],
-                        "Information Technology": ["BSIT", "Computer Science"],
-                        "Graduate Studies": ["MA/MS Programs", "PhD Programs", "MBA", "MPA"]
-                    }
-                },
-                { 
-                    name: "Leyte Normal University", 
-                    domains: ["lnu.edu.ph"], 
-                    web_pages: ["https://lnu.edu.ph/"],
-                    courses: {
-                        "Teacher Education": ["BEEd", "BSEd majors", "BPEd", "Doctor of Education"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Mathematics"],
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship"],
-                        "Information Technology": ["BSIT", "Computer Science"],
-                        "Graduate Studies": ["MA Education", "MA Psychology", "PhD Education"]
-                    }
-                },
-                { 
-                    name: "Visayas State University", 
-                    domains: ["vsu.edu.ph"], 
-                    web_pages: ["https://www.vsu.edu.ph/"],
-                    courses: {
-                        "Agriculture": ["BS Agriculture", "Agricultural Engineering", "Agribusiness"],
-                        "Veterinary Medicine": ["Doctor of Veterinary Medicine"],
-                        "Fisheries": ["BS Fisheries", "Aquaculture"],
-                        "Engineering": ["Civil Engineering", "Agricultural Engineering"],
-                        "Education": ["BEEd", "BSEd majors"],
-                        "Arts & Sciences": ["Biology", "Chemistry", "Mathematics", "Psychology"],
-                        "Graduate Studies": ["MS/PhD in Agriculture", "MS Fisheries", "PhD Programs"]
-                    }
-                },
+                // Region I - Ilocos Region
+                { name: "Mariano Marcos State University", domains: ["mmsu.edu.ph"], web_pages: ["https://www.mmsu.edu.ph/"] },
+                { name: "University of Northern Philippines", domains: ["unp.edu.ph"], web_pages: ["https://www.unp.edu.ph/"] },
+                { name: "Don Mariano Marcos Memorial State University", domains: ["dmmmsu.edu.ph"], web_pages: ["https://www.dmmmsu.edu.ph/"] },
+                { name: "Pangasinan State University", domains: ["psu.edu.ph"], web_pages: ["https://www.psu.edu.ph/"] },
+                { name: "University of Pangasinan", domains: ["upang.edu.ph"], web_pages: ["https://www.upang.edu.ph/"] },
+                { name: "Northwestern University", domains: ["nwu.edu.ph"], web_pages: ["https://nwu.edu.ph/"] },
+                { name: "Virgen Milagrosa University Foundation", domains: ["vmu.edu.ph"], web_pages: ["https://vmu.edu.ph/"] },
+                { name: "Ilocos Sur Polytechnic State College", domains: ["ispsc.edu.ph"], web_pages: ["https://ispsc.edu.ph/"] },
+                { name: "La Union College of Nursing", domains: ["lucn.edu.ph"], web_pages: ["#"] },
+                { name: "Lorma Colleges", domains: ["lorma.edu"], web_pages: ["https://lorma.edu/"] },
+                { name: "Lyceum Northwestern University", domains: ["lnu.edu.ph"], web_pages: ["https://lnu.edu.ph/"] },
+                { name: "Saint Louis College", domains: ["slc.edu.ph"], web_pages: ["#"] },
+                { name: "Union Christian College", domains: ["ucc.edu.ph"], web_pages: ["#"] },
+                { name: "University of Luzon", domains: ["ul.edu.ph"], web_pages: ["https://ul.edu.ph/"] },
+                { name: "Urdaneta City University", domains: ["ucu.edu.ph"], web_pages: ["https://ucu.edu.ph/"] },
                 
-                // --- MINDANAO ---
-                { 
-                    name: "University of the Philippines Mindanao", 
-                    domains: ["upmin.edu.ph"], 
-                    web_pages: ["https://www.upmin.edu.ph/"],
-                    courses: {
-                        "Agriculture": ["BS Agriculture", "Agribusiness Economics"],
-                        "Food Science": ["BS Food Technology"],
-                        "Computer Science": ["BS Computer Science"],
-                        "Communication": ["BA Communication Arts"],
-                        "Biology": ["BS Biology"],
-                        "Mathematics": ["BS Applied Mathematics"],
-                        "Graduate Studies": ["MS Tropical Agriculture", "MS Food Science"]
-                    }
-                },
-                { 
-                    name: "Ateneo de Davao University", 
-                    domains: ["addu.edu.ph"], 
-                    web_pages: ["https://www.addu.edu.ph/"],
-                    courses: {
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Economics", "Hospitality Management", "Tourism Management"],
-                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electronics Engineering", "Industrial Engineering"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MBA", "MPA", "MS Programs", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "Mindanao State University", 
-                    domains: ["msumain.edu.ph"], 
-                    web_pages: ["https://www.msumain.edu.ph/"],
-                    courses: {
-                        "Agriculture": ["BS Agriculture", "Agricultural Engineering"],
-                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Electrical Engineering", "Mechanical Engineering"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Business": ["Accountancy", "Business Administration", "Economics"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics", "Physics"],
-                        "Health Sciences": ["Medicine", "Nursing", "Medical Technology"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MS/PhD Programs", "MBA", "MPA"]
-                    }
-                },
-                { 
-                    name: "Mindanao State University - Iligan Institute of Technology", 
-                    domains: ["msuiit.edu.ph"], 
-                    web_pages: ["https://www.msuiit.edu.ph/"],
-                    courses: {
-                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering", "Metallurgical Engineering"],
-                        "Science": ["Biology", "Chemistry", "Mathematics", "Physics", "Marine Biology"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Business": ["Accountancy", "Business Administration", "Economics"],
-                        "Education": ["BEEd", "BSEd majors"],
-                        "Arts & Sciences": ["Psychology", "Political Science", "Sociology", "Communication"],
-                        "Graduate Studies": ["MS/PhD Engineering", "MS/PhD Science", "MBA"]
-                    }
-                },
-                { 
-                    name: "Xavier University", 
-                    domains: ["xu.edu.ph"], 
-                    web_pages: ["https://www.xu.edu.ph/"],
-                    courses: {
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Economics", "Hospitality Management", "Tourism Management"],
-                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Industrial Engineering", "Mechanical Engineering"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Health Sciences": ["Nursing", "Medical Technology"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MBA", "MPA", "MS Programs", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "University of Mindanao", 
-                    domains: ["umindanao.edu.ph"], 
-                    web_pages: ["https://www.umindanao.edu.ph/"],
-                    courses: {
-                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering", "Industrial Engineering"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Economics", "Hospitality Management", "Tourism Management"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics"],
-                        "Health Sciences": ["Nursing", "Medical Technology", "Pharmacy"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "University of the Immaculate Conception", 
-                    domains: ["uic.edu.ph"], 
-                    web_pages: ["https://www.uic.edu.ph/"],
-                    courses: {
-                        "Health Sciences": ["Nursing", "Medical Technology", "Pharmacy", "Physical Therapy", "Radiologic Technology"],
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
-                        "Education": ["BEEd", "BSEd majors"],
-                        "Arts & Sciences": ["Psychology", "Communication", "Biology", "Mathematics"],
-                        "Information Technology": ["BSIT", "Computer Science"],
-                        "Graduate Studies": ["MBA", "MS Nursing", "MA Education"]
-                    }
-                },
-                { 
-                    name: "Western Mindanao State University", 
-                    domains: ["wmsu.edu.ph"], 
-                    web_pages: ["https://wmsu.edu.ph/"],
-                    courses: {
-                        "Engineering": ["Civil Engineering", "Electrical Engineering", "Mechanical Engineering"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Business": ["Accountancy", "Business Administration", "Economics", "Hospitality Management"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Arts & Sciences": ["Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics"],
-                        "Health Sciences": ["Nursing", "Medical Technology"],
-                        "Graduate Studies": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
-                    }
-                },
-                { 
-                    name: "Ateneo de Zamboanga University", 
-                    domains: ["adzu.edu.ph"], 
-                    web_pages: ["https://www.adzu.edu.ph/"],
-                    courses: {
-                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
-                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering"],
-                        "Information Technology": ["Computer Science", "Information Technology"],
-                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Mathematics"],
-                        "Education": ["BEEd", "BSEd majors", "BPEd"],
-                        "Health Sciences": ["Nursing", "Medical Technology"],
-                        "Law": ["Juris Doctor"],
-                        "Graduate Studies": ["MBA", "MPA", "MS Programs"]
-                    }
-                },
-                { 
-                    name: "JH Cerilles State College", 
-                    domains: ["jhcsc.edu.ph"], 
-                    web_pages: ["https://jhcsc.edu.ph/"],
-                    courses: {
-                        "Main Campus": [
-                            "MS Agricultural Development [citation:5]",
-                            "MS Environmental Resources Management",
-                            "BS Agriculture (Crop/Animal Science)",
-                            "BS Forestry",
-                            "BS Environmental Science",
-                            "MA Education (Educational Admin/English/Filipino/Science/Math)",
-                            "BEEd",
-                            "BSEd",
-                            "BS Civil Engineering",
-                            "BS Agricultural Biosystems Engineering",
-                            "BSIT",
-                            "BA English Language Studies",
-                            "BA Political Science",
-                            "BS Social Work"
-                        ],
-                        "Dumingag Campus": [
-                            "MS Agricultural Development",
-                            "BS Agriculture",
-                            "MA Education",
-                            "BEEd",
-                            "BPEd",
-                            "BSEd",
-                            "BSIT",
-                            "BS Criminology",
-                            "BS Industrial Security Management"
-                        ],
-                        "Canuto MS Enerio Campus": [
-                            "BTLEd (Industrial Arts/Home Economics)",
-                            "BTVTEd (Food Service Management/Automotive/Drafting/Electronics/Electrical)",
-                            "BSIT",
-                            "BS Industrial Technology"
-                        ],
-                        "Pagadian Annex": [
-                            "Juris Doctor",
-                            "BSEd",
-                            "BSIT",
-                            "BS Nursing",
-                            "BS Hospitality Management",
-                            "BS Tourism Management",
-                            "BS Entrepreneurship"
-                        ]
-                    }
-                }
+                // Region II - Cagayan Valley
+                { name: "Cagayan State University", domains: ["csu.edu.ph"], web_pages: ["https://www.csu.edu.ph/"] },
+                { name: "Isabela State University", domains: ["isu.edu.ph"], web_pages: ["https://www.isu.edu.ph/"] },
+                { name: "Nueva Vizcaya State University", domains: ["nvsu.edu.ph"], web_pages: ["https://www.nvsu.edu.ph/"] },
+                { name: "Quirino State University", domains: ["qsu.edu.ph"], web_pages: ["https://qsu.edu.ph/"] },
+                { name: "University of La Salette", domains: ["uls.edu.ph"], web_pages: ["https://uls.edu.ph/"] },
+                { name: "St. Mary's University", domains: ["smu.edu.ph"], web_pages: ["https://smu.edu.ph/"] },
+                { name: "Philippine Normal University - Isabela", domains: ["pnu.edu.ph"], web_pages: ["https://www.pnu.edu.ph/"] },
+                
+                // Region III - Central Luzon
+                { name: "Angeles University Foundation", domains: ["auf.edu.ph"], web_pages: ["https://www.auf.edu.ph/"] },
+                { name: "Bataan Peninsula State University", domains: ["bpsu.edu.ph"], web_pages: ["https://bpsu.edu.ph/"] },
+                { name: "Bulacan State University", domains: ["bulsu.edu.ph"], web_pages: ["https://bulsu.edu.ph/"] },
+                { name: "Central Luzon State University", domains: ["clsu.edu.ph"], web_pages: ["https://clsu.edu.ph/"] },
+                { name: "Don Honorio Ventura State University", domains: ["dhvsu.edu.ph"], web_pages: ["https://dhvsu.edu.ph/"] },
+                { name: "Holy Angel University", domains: ["hau.edu.ph"], web_pages: ["https://www.hau.edu.ph/"] },
+                { name: "Nueva Ecija University of Science and Technology", domains: ["neust.edu.ph"], web_pages: ["https://neust.edu.ph/"] },
+                { name: "Pampanga State Agricultural University", domains: ["psau.edu.ph"], web_pages: ["https://psau.edu.ph/"] },
+                { name: "Tarlac State University", domains: ["tsu.edu.ph"], web_pages: ["https://www.tsu.edu.ph/"] },
+                { name: "Tarlac Agricultural University", domains: ["tau.edu.ph"], web_pages: ["https://tau.edu.ph/"] },
+                { name: "Wesleyan University-Philippines", domains: ["wesleyan.edu.ph"], web_pages: ["https://www.wesleyan.edu.ph/"] },
+                { name: "Aurora State College of Technology", domains: ["ascot.edu.ph"], web_pages: ["https://ascot.edu.ph/"] },
+                { name: "Baliuag University", domains: ["baliuagu.edu.ph"], web_pages: ["https://baliuagu.edu.ph/"] },
+                { name: "Colegio de San Lorenzo", domains: ["cdsl.edu.ph"], web_pages: ["#"] },
+                { name: "College of the Holy Spirit", domains: ["chs.edu.ph"], web_pages: ["#"] },
+                { name: "La Consolacion University Philippines", domains: ["lcup.edu.ph"], web_pages: ["https://lcup.edu.ph/"] },
+                { name: "Mabalacat City College", domains: ["mcc.edu.ph"], web_pages: ["https://mcc.edu.ph/"] },
+                { name: "Philippine State College of Aeronautics", domains: ["philsca.edu.ph"], web_pages: ["https://www.philsca.edu.ph/"] },
+                { name: "President Ramon Magsaysay State University", domains: ["prmsu.edu.ph"], web_pages: ["https://prmsu.edu.ph/"] },
+                { name: "Saint Michael's College", domains: ["smc.edu.ph"], web_pages: ["#"] },
+                
+                // Region IV-A - CALABARZON
+                { name: "University of the Philippines Los Baños", domains: ["uplb.edu.ph"], web_pages: ["https://uplb.edu.ph/"] },
+                { name: "De La Salle University - Dasmariñas", domains: ["dlsud.edu.ph"], web_pages: ["https://www.dlsud.edu.ph/"] },
+                { name: "University of Batangas", domains: ["ub.edu.ph"], web_pages: ["https://ub.edu.ph/"] },
+                { name: "Batangas State University", domains: ["batstate-u.edu.ph"], web_pages: ["https://www.batstate-u.edu.ph/"] },
+                { name: "Cavite State University", domains: ["cvsu.edu.ph"], web_pages: ["https://www.cvsu.edu.ph/"] },
+                { name: "Laguna State Polytechnic University", domains: ["lspu.edu.ph"], web_pages: ["https://lspu.edu.ph/"] },
+                { name: "Lyceum of the Philippines University - Batangas", domains: ["lpubatangas.edu.ph"], web_pages: ["https://lpubatangas.edu.ph/"] },
+                { name: "Manuel S. Enverga University Foundation", domains: ["mseuf.edu.ph"], web_pages: ["https://mseuf.edu.ph/"] },
+                { name: "University of Perpetual Help System Laguna", domains: ["perpetuallaguna.edu.ph"], web_pages: ["https://perpetuallaguna.edu.ph/"] },
+                { name: "Southern Luzon State University", domains: ["slsu.edu.ph"], web_pages: ["https://slsu.edu.ph/"] },
+                { name: "Adventist University of the Philippines", domains: ["aup.edu.ph"], web_pages: ["https://www.aup.edu.ph/"] },
+                { name: "Colegio de San Juan de Letran - Calamba", domains: ["letran-calamba.edu.ph"], web_pages: ["https://letran-calamba.edu.ph/"] },
+                { name: "First Asia Institute of Technology and Humanities", domains: ["firstasia.edu.ph"], web_pages: ["https://firstasia.edu.ph/"] },
+                { name: "Laguna College", domains: ["lc.edu.ph"], web_pages: ["https://lc.edu.ph/"] },
+                { name: "Lipa City Colleges", domains: ["lcc.edu.ph"], web_pages: ["#"] },
+                { name: "Philippine Merchant Marine Academy", domains: ["pma.edu.ph"], web_pages: ["https://pma.edu.ph/"] },
+                { name: "San Pablo Colleges", domains: ["spc.edu.ph"], web_pages: ["#"] },
+                { name: "University of Rizal System", domains: ["urs.edu.ph"], web_pages: ["https://urs.edu.ph/"] },
+                
+                // Region IV-B - MIMAROPA
+                { name: "Palawan State University", domains: ["psu.palawan.edu.ph"], web_pages: ["https://psu.palawan.edu.ph/"] },
+                { name: "Mindoro State University", domains: ["minsu.edu.ph"], web_pages: ["https://minsu.edu.ph/"] },
+                { name: "Marinduque State College", domains: ["msc.edu.ph"], web_pages: ["https://msc.edu.ph/"] },
+                { name: "Occidental Mindoro State College", domains: ["omsc.edu.ph"], web_pages: ["https://omsc.edu.ph/"] },
+                { name: "Romblon State University", domains: ["rsu.edu.ph"], web_pages: ["https://rsu.edu.ph/"] },
+                { name: "Divine Word College of Calapan", domains: ["dwcc.edu.ph"], web_pages: ["#"] },
+                
+                // Region V - Bicol Region
+                { name: "University of Santo Tomas - Legazpi", domains: ["ust-legazpi.edu.ph"], web_pages: ["https://www.ust-legazpi.edu.ph/"] },
+                { name: "Bicol University", domains: ["bicol-u.edu.ph"], web_pages: ["https://www.bicol-u.edu.ph/"] },
+                { name: "Ateneo de Naga University", domains: ["adnu.edu.ph"], web_pages: ["https://adnu.edu.ph/"] },
+                { name: "Catanduanes State University", domains: ["catanduanesstateu.edu.ph"], web_pages: ["https://catanduanesstateu.edu.ph/"] },
+                { name: "Central Bicol State University of Agriculture", domains: ["cbsua.edu.ph"], web_pages: ["https://cbsua.edu.ph/"] },
+                { name: "Dr. Emilio B. Espinosa Sr. Memorial State College of Agriculture and Technology", domains: ["debesmscat.edu.ph"], web_pages: ["https://debesmscat.edu.ph/"] },
+                { name: "Partido State University", domains: ["parsu.edu.ph"], web_pages: ["https://parsu.edu.ph/"] },
+                { name: "Sorsogon State University", domains: ["sorsu.edu.ph"], web_pages: ["https://sorsu.edu.ph/"] },
+                { name: "University of Northeastern Philippines", domains: ["unep.edu.ph"], web_pages: ["#"] },
+                
+                // Region VI - Western Visayas
+                { name: "University of the Philippines Visayas", domains: ["upv.edu.ph"], web_pages: ["https://www.upv.edu.ph/"] },
+                { name: "Central Philippine University", domains: ["cpu.edu.ph"], web_pages: ["https://cpu.edu.ph/"] },
+                { name: "University of San Agustin", domains: ["usa.edu.ph"], web_pages: ["https://usa.edu.ph/"] },
+                { name: "West Visayas State University", domains: ["wvsu.edu.ph"], web_pages: ["https://wvsu.edu.ph/"] },
+                { name: "Aklan State University", domains: ["asu.edu.ph"], web_pages: ["https://asu.edu.ph/"] },
+                { name: "Capiz State University", domains: ["capsu.edu.ph"], web_pages: ["https://capsu.edu.ph/"] },
+                { name: "Carlos Hilado Memorial State University", domains: ["chmsu.edu.ph"], web_pages: ["https://chmsu.edu.ph/"] },
+                { name: "Guimaras State University", domains: ["gsu.edu.ph"], web_pages: ["https://gsu.edu.ph/"] },
+                { name: "Iloilo Science and Technology University", domains: ["isatu.edu.ph"], web_pages: ["https://isatu.edu.ph/"] },
+                { name: "Northern Iloilo State University", domains: ["nisu.edu.ph"], web_pages: ["https://nisu.edu.ph/"] },
+                { name: "University of Iloilo", domains: ["ui.edu.ph"], web_pages: ["https://www.ui.edu.ph/"] },
+                { name: "University of Negros Occidental - Recoletos", domains: ["unor.edu.ph"], web_pages: ["https://www.unor.edu.ph/"] },
+                { name: "St. Paul University Iloilo", domains: ["spui.edu.ph"], web_pages: ["https://spui.edu.ph/"] },
+                { name: "John B. Lacson Foundation Maritime University", domains: ["jblfmu.edu.ph"], web_pages: ["https://jblfmu.edu.ph/"] },
+                
+                // Region VII - Central Visayas
+                { name: "University of San Carlos", domains: ["usc.edu.ph"], web_pages: ["https://www.usc.edu.ph/"] },
+                { name: "University of San Jose - Recoletos", domains: ["usjr.edu.ph"], web_pages: ["https://usjr.edu.ph/"] },
+                { name: "University of the Visayas", domains: ["uv.edu.ph"], web_pages: ["https://www.uv.edu.ph/"] },
+                { name: "Cebu Technological University", domains: ["ctu.edu.ph"], web_pages: ["https://www.ctu.edu.ph/"] },
+                { name: "Cebu Normal University", domains: ["cnu.edu.ph"], web_pages: ["https://cnu.edu.ph/"] },
+                { name: "Southwestern University", domains: ["swu.edu.ph"], web_pages: ["https://swu.edu.ph/"] },
+                { name: "University of Bohol", domains: ["universityofbohol.edu.ph"], web_pages: ["https://universityofbohol.edu.ph/"] },
+                { name: "Bohol Island State University", domains: ["bisu.edu.ph"], web_pages: ["https://www.bisu.edu.ph/"] },
+                { name: "Cebu Institute of Technology - University", domains: ["cit.edu"], web_pages: ["https://www.cit.edu/"] },
+                { name: "Negros Oriental State University", domains: ["norsu.edu.ph"], web_pages: ["https://norsu.edu.ph/"] },
+                { name: "Silliman University", domains: ["su.edu.ph"], web_pages: ["https://su.edu.ph/"] },
+                { name: "St. Paul University Dumaguete", domains: ["spud.edu.ph"], web_pages: ["https://spud.edu.ph/"] },
+                
+                // Region VIII - Eastern Visayas
+                { name: "Leyte Normal University", domains: ["lnu.edu.ph"], web_pages: ["https://lnu.edu.ph/"] },
+                { name: "Visayas State University", domains: ["vsu.edu.ph"], web_pages: ["https://www.vsu.edu.ph/"] },
+                { name: "University of the Philippines Tacloban College", domains: ["up.edu.ph"], web_pages: ["https://www.up.edu.ph/"] },
+                { name: "Eastern Visayas State University", domains: ["evsu.edu.ph"], web_pages: ["https://www.evsu.edu.ph/"] },
+                { name: "University of Eastern Philippines", domains: ["uep.edu.ph"], web_pages: ["https://uep.edu.ph/"] },
+                { name: "Samar State University", domains: ["ssu.edu.ph"], web_pages: ["https://www.ssu.edu.ph/"] },
+                { name: "Northwest Samar State University", domains: ["nwssu.edu.ph"], web_pages: ["https://nwssu.edu.ph/"] },
+                { name: "Biliran Province State University", domains: ["bipsu.edu.ph"], web_pages: ["https://bipsu.edu.ph/"] },
+                { name: "Southern Leyte State University", domains: ["slsu.edu.ph"], web_pages: ["https://slsu.edu.ph/"] },
+                { name: "Palompon Institute of Technology", domains: ["pit.edu.ph"], web_pages: ["https://pit.edu.ph/"] },
+                
+                // Region IX - Zamboanga Peninsula
+                { name: "Western Mindanao State University", domains: ["wmsu.edu.ph"], web_pages: ["https://wmsu.edu.ph/"] },
+                { name: "Ateneo de Zamboanga University", domains: ["adzu.edu.ph"], web_pages: ["https://www.adzu.edu.ph/"] },
+                { name: "University of Zamboanga", domains: ["uz.edu.ph"], web_pages: ["https://www.uz.edu.ph/"] },
+                { name: "Jose Rizal Memorial State University", domains: ["jrmsu.edu.ph"], web_pages: ["https://jrmsu.edu.ph/"] },
+                { name: "Zamboanga State College of Marine Sciences and Technology", domains: ["zscmst.edu.ph"], web_pages: ["https://zscmst.edu.ph/"] },
+                { name: "Basilan State College", domains: ["bsc.edu.ph"], web_pages: ["https://bsc.edu.ph/"] },
+                { name: "Southern City Colleges", domains: ["scc.edu.ph"], web_pages: ["#"] },
+                
+                // Region X - Northern Mindanao
+                { name: "Mindanao State University - Iligan Institute of Technology", domains: ["msuiit.edu.ph"], web_pages: ["https://www.msuiit.edu.ph/"] },
+                { name: "Xavier University", domains: ["xu.edu.ph"], web_pages: ["https://www.xu.edu.ph/"] },
+                { name: "University of Science and Technology of Southern Philippines", domains: ["ustp.edu.ph"], web_pages: ["https://www.ustp.edu.ph/"] },
+                { name: "Bukidnon State University", domains: ["buksu.edu.ph"], web_pages: ["https://buksu.edu.ph/"] },
+                { name: "Central Mindanao University", domains: ["cmu.edu.ph"], web_pages: ["https://www.cmu.edu.ph/"] },
+                { name: "Liceo de Cagayan University", domains: ["liceo.edu.ph"], web_pages: ["https://www.liceo.edu.ph/"] },
+                { name: "Misamis University", domains: ["mu.edu.ph"], web_pages: ["https://mu.edu.ph/"] },
+                { name: "University of Misamis", domains: ["um.edu.ph"], web_pages: ["https://um.edu.ph/"] },
+                { name: "Northwestern Mindanao State College of Science and Technology", domains: ["nmscst.edu.ph"], web_pages: ["#"] },
+                
+                // Region XI - Davao Region
+                { name: "University of the Philippines Mindanao", domains: ["upmin.edu.ph"], web_pages: ["https://www.upmin.edu.ph/"] },
+                { name: "Ateneo de Davao University", domains: ["addu.edu.ph"], web_pages: ["https://www.addu.edu.ph/"] },
+                { name: "University of Mindanao", domains: ["umindanao.edu.ph"], web_pages: ["https://www.umindanao.edu.ph/"] },
+                { name: "University of the Immaculate Conception", domains: ["uic.edu.ph"], web_pages: ["https://www.uic.edu.ph/"] },
+                { name: "Davao del Norte State College", domains: ["dnsc.edu.ph"], web_pages: ["https://dnsc.edu.ph/"] },
+                { name: "Davao Oriental State University", domains: ["dorsu.edu.ph"], web_pages: ["https://dorsu.edu.ph/"] },
+                { name: "Southern Philippines Agri-Business and Marine and Aquatic School of Technology", domains: ["spamast.edu.ph"], web_pages: ["https://spamast.edu.ph/"] },
+                { name: "University of Southeastern Philippines", domains: ["usep.edu.ph"], web_pages: ["https://www.usep.edu.ph/"] },
+                { name: "Holy Cross of Davao College", domains: ["hcdc.edu.ph"], web_pages: ["https://hcdc.edu.ph/"] },
+                { name: "Philippine Women's College of Davao", domains: ["pwc.edu.ph"], web_pages: ["https://pwc.edu.ph/"] },
+                
+                // Region XII - SOCCSKSARGEN
+                { name: "University of Southern Mindanao", domains: ["usm.edu.ph"], web_pages: ["https://www.usm.edu.ph/"] },
+                { name: "Notre Dame University", domains: ["ndu.edu.ph"], web_pages: ["https://www.ndu.edu.ph/"] },
+                { name: "Cotabato State University", domains: ["csu.edu.ph"], web_pages: ["https://csu.edu.ph/"] },
+                { name: "Notre Dame of Dadiangas University", domains: ["nddu.edu.ph"], web_pages: ["https://nddu.edu.ph/"] },
+                { name: "Sultan Kudarat State University", domains: ["sksu.edu.ph"], web_pages: ["https://sksu.edu.ph/"] },
+                { name: "South Cotabato State College", domains: ["scsc.edu.ph"], web_pages: ["https://scsc.edu.ph/"] },
+                { name: "Mindanao State University - General Santos", domains: ["msugensan.edu.ph"], web_pages: ["https://msugensan.edu.ph/"] },
+                
+                // Region XIII - Caraga
+                { name: "Caraga State University", domains: ["carsu.edu.ph"], web_pages: ["https://www.carsu.edu.ph/"] },
+                { name: "Surigao del Norte State University", domains: ["snsu.edu.ph"], web_pages: ["https://www.snsu.edu.ph/"] },
+                { name: "Surigao del Sur State University", domains: ["sdssu.edu.ph"], web_pages: ["https://sdssu.edu.ph/"] },
+                { name: "Father Saturnino Urios University", domains: ["urios.edu.ph"], web_pages: ["https://www.urios.edu.ph/"] },
+                { name: "Agusan del Sur State College of Agriculture and Technology", domains: ["asscat.edu.ph"], web_pages: ["https://asscat.edu.ph/"] },
+                { name: "North Eastern Mindanao State University", domains: ["nemsu.edu.ph"], web_pages: ["https://nemsu.edu.ph/"] },
+                
+                // Bangsamoro Autonomous Region (BARMM)
+                { name: "Mindanao State University - Main", domains: ["msumain.edu.ph"], web_pages: ["https://www.msumain.edu.ph/"] },
+                { name: "Mindanao State University - Maguindanao", domains: ["msumaguindanao.edu.ph"], web_pages: ["https://msumaguindanao.edu.ph/"] },
+                { name: "Mindanao State University - Sulu", domains: ["msusulu.edu.ph"], web_pages: ["https://msusulu.edu.ph/"] },
+                { name: "Mindanao State University - Tawi-Tawi", domains: ["msutawitawi.edu.ph"], web_pages: ["https://msutawitawi.edu.ph/"] },
+                { name: "Cotabato State University", domains: ["csu.edu.ph"], web_pages: ["https://csu.edu.ph/"] },
+                { name: "Adiong Memorial Polytechnic State College", domains: ["ampsc.edu.ph"], web_pages: ["#"] },
+                { name: "Sulu State College", domains: ["ssc.edu.ph"], web_pages: ["#"] },
+                { name: "Tawi-Tawi Regional Agricultural College", domains: ["trac.edu.ph"], web_pages: ["#"] }
             ];
 
             // Region Keywords for classification
@@ -1316,7 +918,8 @@
                     'catanduanes', 'masbate', 'sorsogon', 'dlsu', 'ateneo', 'ust', 'up', 'santo tomas', 
                     'de la salle', 'polytechnic', 'feu', 'adamson', 'university of the east', 'far eastern', 
                     'east', 'saint louis', 'cordilleras', 'pup', 'tup', 'ceu', 'san beda', 'national university',
-                    'bulacan state', 'bataan peninsula', 'batangas state', 'cavite state'
+                    'bulacan state', 'bataan peninsula', 'batangas state', 'cavite state', 'pampanga',
+                    'tarlac state', 'nueva ecija', 'la salette', 'urdaneta'
                 ],
                 visayas: [
                     'cebu', 'iloilo', 'bacolod', 'tacloban', 'leyte', 'samar', 'negros', 'bohol', 'palawan', 
@@ -1325,7 +928,7 @@
                     'western samar', 'st. paul dumaguete', 'visayas state', 'cebu normal',
                     'west visayas', 'university of san carlos', 'university of san jose',
                     'university of the visayas', 'southwestern university', 'negros oriental',
-                    'leyte normal', 'eastern visayas'
+                    'leyte normal', 'eastern visayas', 'iloilo science', 'st. theresa', 'cebu doctors'
                 ],
                 mindanao: [
                     'davao', 'cagayan de oro', 'zamboanga', 'cotabato', 'butuan', 'surigao', 'lanao', 
@@ -1335,7 +938,8 @@
                     'davao oriental', 'davao del sur', 'davao del norte', 'davao occidental',
                     'zamboanga del norte', 'zamboanga del sur', 'zamboanga sibugay',
                     'misamis occidental', 'misamis oriental', 'ateneo de davao', 'university of mindanao',
-                    'western mindanao', 'southern mindanao', 'notre dame', 'jh cerilles'
+                    'western mindanao', 'southern mindanao', 'notre dame', 'mountain view', 'southern baptist',
+                    'cagayan de oro college', 'phinma'
                 ]
             };
 
@@ -1345,7 +949,7 @@
             }
             
             function getWebPage(uni) {
-                return uni.web_pages && uni.web_pages[0] ? uni.web_pages[0] : '';
+                return uni.web_pages && uni.web_pages[0] ? uni.web_pages[0] : '#';
             }
 
             function guessRegion(university) {
@@ -1401,8 +1005,9 @@
                 }
             }
 
-            // ----- Initialize with comprehensive university data -----
+            // ----- Initialize with embedded university data -----
             function loadUniversities() {
+                // Add region to each university
                 allUniversities = PH_UNIVERSITIES.map(uni => {
                     return {
                         ...uni,
@@ -1410,8 +1015,18 @@
                     };
                 });
                 
+                // Remove duplicates by name (just in case)
+                const unique = {};
+                allUniversities = allUniversities.filter(uni => {
+                    if (unique[uni.name]) return false;
+                    unique[uni.name] = true;
+                    return true;
+                });
+                
+                // Sort alphabetically
                 allUniversities.sort((a, b) => a.name.localeCompare(b.name));
                 
+                // Initial render
                 applyFiltersAndSort();
                 resultCountSpan.textContent = `${allUniversities.length} universities loaded`;
             }
@@ -1437,7 +1052,7 @@
                 }
                 
                 filteredUniversities = filtered;
-                resultCountSpan.textContent = `${filtered.length} ${filtered.length === 1 ? 'University' : 'Universities'} found`;
+                resultCountSpan.textContent = `${filtered.length} ${filtered.length === 1 ? 'University' : 'Universities'} found (of ${allUniversities.length} total)`;
                 
                 renderUniversities(filtered);
                 
@@ -1477,9 +1092,7 @@
                             
                             <div class="card-footer">
                                 <span class="location-text"><i class="fas fa-map-marker-alt"></i> Philippines</span>
-                                <span class="course-badge" style="color: var(--accent-primary); font-size:0.85rem;">
-                                    <i class="fas fa-book-open"></i> Click for programs
-                                </span>
+                                ${website !== '#' ? `<a href="${website}" target="_blank" class="visit-link" onclick="event.stopPropagation()">Visit <i class="fas fa-arrow-right"></i></a>` : ''}
                             </div>
                         </div>
                     `;
@@ -1495,41 +1108,11 @@
                 });
             }
 
-            // ----- Modal with Course Display -----
+            // ----- Modal -----
             function showModal(university) {
                 const domain = getDomain(university) || 'N/A';
                 const website = getWebPage(university) || '#';
                 const region = university.region || guessRegion(university);
-                
-                let coursesHtml = '';
-                
-                if (university.courses) {
-                    if (Array.isArray(university.courses)) {
-                        // Handle array format (like JH Cerilles)
-                        coursesHtml = `
-                            <div class="courses-section">
-                                <h3>Academic Programs</h3>
-                                ${university.courses.map(course => `<div class="course-item">${course}</div>`).join('')}
-                            </div>
-                        `;
-                    } else {
-                        // Handle object format with categories
-                        coursesHtml = '<div class="courses-section"><h3>Academic Programs</h3>';
-                        for (const [category, programs] of Object.entries(university.courses)) {
-                            coursesHtml += `
-                                <div class="course-category">
-                                    <h4>${category}</h4>
-                                    <div class="course-list">
-                                        ${programs.map(program => `<span class="course-item">${program}</span>`).join('')}
-                                    </div>
-                                </div>
-                            `;
-                        }
-                        coursesHtml += '</div>';
-                    }
-                } else {
-                    coursesHtml = '<p class="text-muted">Program information not available. Visit university website for details.</p>';
-                }
                 
                 modalBody.innerHTML = `
                     <h2>${university.name}</h2>
@@ -1547,9 +1130,6 @@
                             <p>${region.charAt(0).toUpperCase() + region.slice(1)}</p>
                         </div>
                     </div>
-                    
-                    ${coursesHtml}
-                    
                     <div id="modalMap" class="modal-map"></div>
                 `;
                 
@@ -1559,7 +1139,7 @@
                 setTimeout(() => {
                     const modalMap = L.map('modalMap').setView([12.8797, 121.7740], 6);
                     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>'
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>'
                     }).addTo(modalMap);
                     
                     let lat, lng;
@@ -1632,9 +1212,9 @@
                 lightModeBtn.classList.remove('active');
             });
 
-            // Initialize with comprehensive university data
+            // Initialize with embedded university data (no external file needed)
             loadUniversities();
         })();
     </script>
 </body>
-</>html
+</html>
