@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maria Explorer · Philippine Universities</title>
+    
+    <!-- Leaflet for maps (CSS) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Modern CSS Variables */
+        :root {
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-surface-hover: #f1f5f9;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent-primary: #4f46e5;
+            --accent-hover: #4338ca;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            
+            --badge-luzon-bg: #eff6ff;
+            --badge-luzon-text: #1d4ed8;
+            --badge-visayas-bg: #ecfdf5;
+            --badge-visayas-text: #047857;
+            --badge-mindanao-bg: #fef2f2;
+            --badge-mindanao-text: #b91c1c;
+            
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark-mode {
+            --bg-body: #0b1120;
+            --bg-surface: #1e293b;
+            --bg-surface-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-primary: #6366f1;
+            --accent-hover: #818cf8;
+            --border-color: #334155;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+            
+            --badge-luzon-bg: rgba(29, 78, 216, 0.2);
+            --badge-luzon-text: #60a5fa;
+            --badge-visayas-bg: rgba(4, 120, 87, 0.2);
+            --badge-visayas-text: #34d399;
+            --badge-mindanao-bg: rgba(185, 28, 28, 0.2);
+            --badge-mindanao-text: #f87171;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* ----- Header ----- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .brand h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.75rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: var(--text-main);
+            margin-bottom: 0.25rem;
+        }
+
+        .brand h1 span {
+            color: var(--accent-primary);
+        }
+
+        .brand p {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .theme-toggle {
+            display: flex;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.35rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .theme-toggle button {
+            background: transparent;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .theme-toggle button.active {
+            background: var(--bg-body);
+            color: var(--text-main);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* ----- Controls Section ----- */
+        .controls-wrapper {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input-wrapper i {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        #searchBtn {
+            padding: 0 2rem;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        #searchBtn:hover {
+            background: var(--accent-hover);
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .control-btn, .control-select {
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-select {
+            appearance: none;
+            padding-right: 2.5rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+
+        .control-btn:hover, .control-select:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .control-btn.active-state {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        .stats {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* ----- Map Container ----- */
+        .map-container {
+            height: 400px;
+            margin-bottom: 2rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .map-container.hidden {
+            display: none;
+        }
+
+        /* ----- University Grid ----- */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .university-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            position: relative;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .university-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--border-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .region-badge {
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .region-badge.luzon { background: var(--badge-luzon-bg); color: var(--badge-luzon-text); }
+        .region-badge.visayas { background: var(--badge-visayas-bg); color: var(--badge-visayas-text); }
+        .region-badge.mindanao { background: var(--badge-mindanao-bg); color: var(--badge-mindanao-text); }
+
+        .favorite-btn {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .favorite-btn.active {
+            color: #f59e0b;
+        }
+
+        .university-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .university-domain {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .university-domain:hover {
+            color: var(--accent-primary);
+        }
+
+        .card-footer {
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .location-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .visit-link {
+            color: var(--accent-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: var(--transition);
+        }
+
+        .visit-link:hover {
+            gap: 0.7rem;
+            color: var(--accent-hover);
+        }
+
+        /* ----- Modal ----- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(6px);
+            padding: 1.5rem;
+        }
+
+        .modal-content {
+            background: var(--bg-surface);
+            margin: 2vh auto;
+            padding: 2.5rem;
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .close {
+            position: absolute;
+            right: 1.5rem;
+            top: 1.5rem;
+            width: 36px;
+            height: 36px;
+            background: var(--bg-body);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+
+        .close:hover {
+            background: var(--text-main);
+            color: var(--bg-surface);
+            border-color: var(--text-main);
+        }
+
+        .modal-body h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            padding-right: 3rem;
+        }
+
+        .modal-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            background: var(--bg-body);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .info-group label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .info-group p, .info-group a {
+            font-size: 1.05rem;
+            color: var(--text-main);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .info-group a {
+            color: var(--accent-primary);
+        }
+
+        .info-group a:hover {
+            text-decoration: underline;
+        }
+
+        .modal-map {
+            height: 350px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        /* ----- Course Display ----- */
+        .courses-section {
+            margin-bottom: 2rem;
+        }
+        
+        .courses-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        .course-category {
+            margin-bottom: 1.2rem;
+        }
+        
+        .course-category h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .course-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            list-style: none;
+        }
+        
+        .course-item {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            transition: var(--transition);
+        }
+        
+        .course-item:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+        
+        .course-major {
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-left: 0.25rem;
+        }
+
+        /* ----- States ----- */
+        .state-container {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            grid-column: 1 / -1;
+        }
+
+        .error-icon {
+            color: #ef4444;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .loading-icon {
+            color: var(--accent-primary);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            animation: spin 1s linear infinite;
+        }
+        
+        .retry-btn {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: var(--transition);
+        }
+        
+        .retry-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .search-row { flex-direction: column; }
+            #searchBtn { padding: 1rem; }
+            .filters-row { flex-direction: column; align-items: stretch; }
+            .filter-group { flex-direction: column; }
+            .stats { text-align: center; margin-top: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="brand">
+                <h1>Maria Explorer<span>.</span></h1>
+                <p>Discover academic programs at 90+ Philippine Universities</p>
+            </div>
+            <div class="theme-toggle">
+                <button id="lightModeBtn" class="active"><i class="fas fa-sun"></i> Light</button>
+                <button id="darkModeBtn"><i class="fas fa-moon"></i> Dark</button>
+            </div>
+        </header>
+
+        <!-- Controls Section -->
+        <div class="controls-wrapper">
+            <div class="search-row">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search universities by name..."
+                        autocomplete="off"
+                    >
+                </div>
+                <button id="searchBtn">Search</button>
+            </div>
+            
+            <div class="filters-row">
+                <div class="filter-group">
+                    <select id="regionFilter" class="control-select">
+                        <option value="all">All Regions</option>
+                        <option value="luzon">Luzon</option>
+                        <option value="visayas">Visayas</option>
+                        <option value="mindanao">Mindanao</option>
+                    </select>
+                    <button id="favoritesToggle" class="control-btn"><i class="far fa-heart"></i> Favorites</button>
+                    <button id="mapToggle" class="control-btn"><i class="far fa-map"></i> Show Map</button>
+                </div>
+                <div class="stats" id="resultCount">Loading 90+ universities...</div>
+            </div>
+        </div>
+
+        <!-- Map Container -->
+        <div id="mapContainer" class="map-container hidden"></div>
+
+        <!-- Results Grid -->
+        <div id="results" class="results-grid">
+            <div class="state-container">
+                <i class="fas fa-circle-notch loading-icon"></i>
+                <h3>Loading comprehensive university database...</h3>
+                <p style="color:var(--text-muted); margin-top:0.5rem;">Compiling 90+ Philippine HEIs with detailed program offerings</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="close"><i class="fas fa-times"></i></div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        (function() {
+            // ----- DOM Elements -----
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const regionFilter = document.getElementById('regionFilter');
+            const favoritesToggle = document.getElementById('favoritesToggle');
+            const mapToggle = document.getElementById('mapToggle');
+            const mapContainer = document.getElementById('mapContainer');
+            const resultsDiv = document.getElementById('results');
+            const resultCountSpan = document.getElementById('resultCount');
+            const modal = document.getElementById('modal');
+            const modalBody = document.getElementById('modalBody');
+            const closeBtn = document.querySelector('.close');
+            const lightModeBtn = document.getElementById('lightModeBtn');
+            const darkModeBtn = document.getElementById('darkModeBtn');
+
+            // ----- State variables -----
+            let allUniversities = [];
+            let filteredUniversities = [];
+            let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+            let showingFavorites = false;
+            let map = null;
+            let mapMarkers = [];
+
+            // ----- COMPREHENSIVE PHILIPPINE UNIVERSITIES DATABASE WITH COURSES -----
+            // Sources: CHED official records, PAASCU accreditation data [citation:3][citation:7], university websites [citation:1][citation:5][citation:10]
+            
+            const PH_UNIVERSITIES = [
+                // --- NATIONAL CAPITAL REGION (NCR) - LUZON ---
+                { 
+                    name: "University of the Philippines Diliman", 
+                    domains: ["upd.edu.ph"], 
+                    web_pages: ["https://upd.edu.ph/"],
+                    courses: {
+                        "General Education": ["Arts 1", "Eng 13", "Fil 40", "Kas 1", "Math 10", "Philo 1", "SAS 1", "Soc Sci 1-3", "STS 1", "Speech 30"],
+                        "Science & Mathematics": ["Biology 11", "Chemistry 16", "Math 21", "Environmental Science 1"],
+                        "Social Sciences": ["Anthropology 100", "Economics 11", "Political Science 14", "Sociology 101"],
+                        "Philosophy": ["Philosophical Analysis", "Ethics 171", "Philosophy of Science 160"],
+                        "Physical Education": ["PE 1-2 Foundations", "Elective PE Activities"]
+                    }
+                },
+                { 
+                    name: "Ateneo de Manila University", 
+                    domains: ["ateneo.edu"], 
+                    web_pages: ["https://www.ateneo.edu/"],
+                    courses: {
+                        "School of Humanities": ["AB Humanities", "Interdisciplinary Studies (50+ tracks) [citation:2]", "Fine Arts", "Communication"],
+                        "School of Social Sciences": ["Political Science", "Economics", "Psychology", "Sociology", "History", "Japanese Studies", "Korean Studies", "Chinese Studies"],
+                        "School of Science & Engineering": ["Computer Science [citation:7]", "Information Systems [citation:7]", "Electronics Engineering", "Computer Engineering", "Mathematics", "Physics", "Biology", "Chemistry"],
+                        "Business & Management": ["Management [citation:7]", "Accounting", "Entrepreneurship", "MBA [citation:7]", "MD-MBA [citation:7]"],
+                        "Graduate Programs": ["School of Humanities (Graduate)", "School of Science & Engineering (Graduate)", "School of Social Sciences (Graduate)"],
+                        "Basic Education": ["Grade School", "High School", "Senior High School"]
+                    }
+                },
+                { 
+                    name: "De La Salle University", 
+                    domains: ["dlsu.edu.ph"], 
+                    web_pages: ["https://www.dlsu.edu.ph/"],
+                    courses: {
+                        "Business & Economics": ["Doctor of Business Administration [citation:3]", "MBA [citation:3]", "Accountancy [citation:3]", "Business [citation:3]", "Economics [citation:3]", "Entrepreneurship [citation:3]", "MS in Accountancy", "MS in Financial Engineering", "MS in Computational Finance", "MS in Marketing", "PhD in Business"],
+                        "Engineering": ["Chemical Engineering [citation:3]", "Civil Engineering [citation:3]", "Electronics Engineering [citation:3]", "Industrial Engineering [citation:3]", "Mechanical Engineering [citation:3]", "Manufacturing Engineering Management", "Computer Engineering"],
+                        "Computer Science": ["Computer Science [citation:3]", "Information Technology"],
+                        "Education": ["Elementary Education [citation:3]", "Secondary Education [citation:3]", "Graduate Programs in Education"],
+                        "Liberal Arts & Sciences": ["Liberal Arts [citation:3]", "Sciences [citation:3]", "Political Science", "Psychology", "Communication"],
+                        "Graduate Programs": ["MS Industrial Relations", "MS Management Engineering", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "University of Santo Tomas", 
+                    domains: ["ust.edu.ph"], 
+                    web_pages: ["http://www.ust.edu.ph/"],
+                    courses: {
+                        "Health Sciences": ["Medicine", "Nursing", "Pharmacy", "Medical Technology", "Physical Therapy", "Bachelor in Basic Human Studies (2-year pre-med) [citation:4]"],
+                        "Business & Economics": ["BA Economics [citation:9]", "BS Accountancy [citation:9]", "Bachelor of Accounting Information Systems [citation:9]", "BS Business Administration (Business Economics, Financial Management, HRDM, Marketing) [citation:9]", "BS Entrepreneurship [citation:9]", "BS Tourism Management [citation:9]", "MBA", "MS HR Management", "PhD Commerce", "PhD Economics"],
+                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Electrical Engineering", "Mechanical Engineering", "Electronics Engineering", "Industrial Engineering"],
+                        "Science": ["Biology", "Chemistry", "Physics", "Mathematics", "Psychology"],
+                        "Arts & Letters": ["Communication", "Journalism", "Literature", "Philosophy", "Political Science", "Sociology"],
+                        "Education": ["Elementary Education", "Secondary Education", "Physical Education"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Programs": ["MA Economics", "MA Marketing Communication", "MS Management Engineering", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "Far Eastern University", 
+                    domains: ["feu.edu.ph"], 
+                    web_pages: ["https://www.feu.edu.ph/"],
+                    courses: {
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Biology", "Mathematics"],
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
+                        "Education": ["Secondary Education", "Elementary Education"],
+                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering"],
+                        "Health Sciences": ["Nursing", "Medical Technology", "Physical Therapy", "Pharmacy"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MBA", "MPA", "MA Education", "MS Psychology"]
+                    }
+                },
+                { 
+                    name: "Polytechnic University of the Philippines", 
+                    domains: ["pup.edu.ph"], 
+                    web_pages: ["https://www.pup.edu.ph/"],
+                    courses: {
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Office Administration", "Marketing"],
+                        "Engineering": ["Civil Engineering", "Electrical Engineering", "Electronics Engineering", "Industrial Engineering", "Mechanical Engineering"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Education": ["Secondary Education", "Elementary Education", "Library Science"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Economics", "Mathematics", "Biology"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MBA", "MPA", "MA Education", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "Mapúa University", 
+                    domains: ["mapua.edu.ph"], 
+                    web_pages: ["https://www.mapua.edu.ph/"],
+                    courses: {
+                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Industrial Engineering", "Mechanical Engineering", "Manufacturing Engineering"],
+                        "Architecture": ["Architecture", "Interior Design"],
+                        "Information Technology": ["Computer Science", "Information Technology", "Entertainment Computing"],
+                        "Business": ["Business Administration", "Entrepreneurship", "Accountancy"],
+                        "Multimedia Arts": ["Digital Film", "Multimedia Arts"],
+                        "Graduate Programs": ["MS Engineering", "MBA", "PhD Engineering"]
+                    }
+                },
+                
+                // --- LUZON (North and South Luzon) ---
+                { 
+                    name: "University of the Philippines Los Baños", 
+                    domains: ["uplb.edu.ph"], 
+                    web_pages: ["https://uplb.edu.ph/"],
+                    courses: {
+                        "Agriculture": ["BS Agriculture", "Agricultural Economics", "Agribusiness Management"],
+                        "Forestry": ["BS Forestry", "Forest Products Engineering"],
+                        "Veterinary Medicine": ["Doctor of Veterinary Medicine"],
+                        "Arts & Sciences": ["Biology", "Chemistry", "Mathematics", "Physics", "Communication", "Economics", "Sociology"],
+                        "Engineering": ["Agricultural Engineering", "Chemical Engineering", "Civil Engineering"],
+                        "Environmental Science": ["BS Environmental Science", "BS Human Ecology"],
+                        "Graduate Studies": ["MS/PhD in various fields"]
+                    }
+                },
+                { 
+                    name: "Benguet State University", 
+                    domains: ["bsu.edu.ph"], 
+                    web_pages: ["https://www.bsu.edu.ph/"],
+                    courses: {
+                        "Agriculture": ["BS Agriculture", "Agricultural Technology", "Agribusiness"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Engineering": ["Civil Engineering", "Agricultural Engineering", "Mechanical Engineering"],
+                        "Information Technology": ["BSIT", "Computer Science"],
+                        "Natural Sciences": ["Biology", "Chemistry", "Mathematics"],
+                        "Social Sciences": ["Psychology", "Political Science", "Sociology"],
+                        "Graduate Studies": ["MA Education", "MS Agriculture", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "Saint Louis University", 
+                    domains: ["slu.edu.ph"], 
+                    web_pages: ["https://www.slu.edu.ph/"],
+                    courses: {
+                        "Accountancy & Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
+                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Health Sciences": ["Nursing", "Pharmacy", "Medical Technology", "Physical Therapy", "Radiologic Technology"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Biology", "Chemistry", "Mathematics"],
+                        "Education": ["BEEd", "BSEd", "BPEd"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "University of the Cordilleras", 
+                    domains: ["uc-bcf.edu.ph"], 
+                    web_pages: ["https://www.uc-bcf.edu.ph/"],
+                    courses: {
+                        "Criminal Justice": ["Criminology", "Industrial Security Management"],
+                        "Information Technology": ["Computer Science", "Information Technology", "Multimedia Arts"],
+                        "Engineering": ["Civil Engineering", "Electronics Engineering", "Computer Engineering"],
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
+                        "Teacher Education": ["BEEd", "BSEd majors"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MBA", "MPA", "MS Criminology"]
+                    }
+                },
+                { 
+                    name: "Mariano Marcos State University", 
+                    domains: ["mmsu.edu.ph"], 
+                    web_pages: ["https://www.mmsu.edu.ph/"],
+                    courses: {
+                        "Agriculture": ["BS Agriculture", "Agricultural Engineering", "Agribusiness"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Engineering": ["Civil Engineering", "Electrical Engineering", "Mechanical Engineering", "Agricultural Engineering"],
+                        "Industrial Technology": ["BS Industrial Technology majors"],
+                        "Arts & Sciences": ["Biology", "Chemistry", "Mathematics", "Physics", "Psychology", "Sociology"],
+                        "Health Sciences": ["Nursing", "Midwifery"],
+                        "Graduate Studies": ["MA/MS Programs", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "Pangasinan State University", 
+                    domains: ["psu.edu.ph"], 
+                    web_pages: ["https://www.psu.edu.ph/"],
+                    courses: {
+                        "Education": ["BEEd", "BSEd majors", "BPEd", "BTLEd"],
+                        "Engineering": ["Civil Engineering", "Electrical Engineering", "Mechanical Engineering", "Electronics Engineering"],
+                        "Information Technology": ["BSIT", "Computer Science"],
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management"],
+                        "Agriculture": ["BS Agriculture", "Fisheries"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Biology"],
+                        "Graduate Studies": ["MA/MS Programs", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "Bulacan State University", 
+                    domains: ["bulsu.edu.ph"], 
+                    web_pages: ["https://bulsu.edu.ph/"],
+                    courses: {
+                        "Engineering": ["Civil Engineering", "Electrical Engineering", "Mechanical Engineering", "Electronics Engineering", "Computer Engineering", "Industrial Engineering"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Mathematics"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "Bataan Peninsula State University", 
+                    domains: ["bpsu.edu.ph"], 
+                    web_pages: ["https://bpsu.edu.ph/"],
+                    courses: {
+                        "Abucay Campus": ["BS Agriculture (Animal/Crop Science) [citation:10]", "BTVTEd (Animal/Crops Production)", "BS Agricultural Biosystem Engineering"],
+                        "Bagac Campus": ["BEEd [citation:10]", "BS Industrial Technology (Electrical/Welding)"],
+                        "Balanga Campus": ["BSEd (English/Filipino/Social Studies) [citation:10]", "BS Public Administration", "BS Accountancy", "BS Business Administration (HRM/Marketing/Operations)", "BS Psychology", "AB Psychology"],
+                        "Dinalupihan Campus": ["BEEd", "BSEd (Math/General Science)", "Doctor of Education", "MA Education"],
+                        "Main Campus": ["BS Architecture [citation:10]", "BS Civil/Electrical/Electronics/Mechanical/Industrial Engineering", "BS Nursing", "BS Hospitality/Tourism Management", "AB Communication", "BS Midwifery", "BTVTEd (multiple tracks)", "BS Computer Science", "BSIT", "BS Entertainment Computing", "Doctor of Education", "MA Education", "MBA", "MPA", "MS Nursing"],
+                        "Orani Campus": ["BS Fisheries [citation:10]", "BTLEd Industrial Arts", "BPEd", "BS Exercise Sports Science", "MS Agriculture"]
+                    }
+                },
+                { 
+                    name: "Batangas State University", 
+                    domains: ["batstate-u.edu.ph"], 
+                    web_pages: ["https://www.batstate-u.edu.ph/"],
+                    courses: {
+                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering", "Industrial Engineering", "Computer Engineering"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Teacher Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
+                        "Science": ["Biology", "Chemistry", "Mathematics", "Physics"],
+                        "Arts & Sciences": ["Psychology", "Political Science", "Communication"],
+                        "Graduate Studies": ["MS/PhD Engineering", "MBA", "PhD Education"]
+                    }
+                },
+                { 
+                    name: "Cavite State University", 
+                    domains: ["cvsu.edu.ph"], 
+                    web_pages: ["https://www.cvsu.edu.ph/"],
+                    courses: {
+                        "Agriculture": ["BS Agriculture", "Agricultural Engineering", "Agribusiness"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Engineering": ["Civil Engineering", "Electrical Engineering", "Mechanical Engineering", "Computer Engineering"],
+                        "Information Technology": ["BSIT", "Computer Science"],
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
+                        "Health Sciences": ["Nursing", "Medical Technology"],
+                        "Veterinary Medicine": ["Doctor of Veterinary Medicine"],
+                        "Graduate Studies": ["MS/PhD Programs"]
+                    }
+                },
+                { 
+                    name: "University of Batangas", 
+                    domains: ["ub.edu.ph"], 
+                    web_pages: ["https://ub.edu.ph/"],
+                    courses: {
+                        "Engineering": ["Civil Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering", "Computer Engineering"],
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
+                        "Education": ["BEEd", "BSEd majors"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science"],
+                        "Health Sciences": ["Nursing", "Medical Technology", "Pharmacy"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MBA", "MPA", "MS Nursing", "PhD Education"]
+                    }
+                },
+                { 
+                    name: "Bicol University", 
+                    domains: ["bicol-u.edu.ph"], 
+                    web_pages: ["https://www.bicol-u.edu.ph/"],
+                    courses: {
+                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Electrical Engineering", "Mechanical Engineering"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship"],
+                        "Science": ["Biology", "Chemistry", "Mathematics", "Physics"],
+                        "Arts & Sciences": ["Psychology", "Political Science", "Sociology", "Communication"],
+                        "Health Sciences": ["Nursing", "Medical Technology", "Midwifery"],
+                        "Agriculture": ["BS Agriculture", "Fisheries"],
+                        "Veterinary Medicine": ["Doctor of Veterinary Medicine"],
+                        "Graduate Studies": ["MA/MS Programs", "PhD Programs"]
+                    }
+                },
+                
+                // --- VISAYAS ---
+                { 
+                    name: "University of San Carlos", 
+                    domains: ["usc.edu.ph"], 
+                    web_pages: ["https://www.usc.edu.ph/"],
+                    courses: {
+                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering", "Industrial Engineering"],
+                        "Architecture": ["Architecture"],
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Economics"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics", "Physics"],
+                        "Education": ["BEEd", "BSEd majors"],
+                        "Health Sciences": ["Nursing", "Pharmacy", "Medical Technology", "Physical Therapy"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MBA", "MPA", "MS/PhD Programs"]
+                    }
+                },
+                { 
+                    name: "University of the Philippines Visayas", 
+                    domains: ["upv.edu.ph"], 
+                    web_pages: ["https://www.upv.edu.ph/"],
+                    courses: {
+                        "Fisheries": ["BS Fisheries", "Fisheries Technology"],
+                        "Aquaculture": ["BS Aquaculture"],
+                        "Marine Science": ["BS Marine Biology", "Oceanography"],
+                        "Management": ["BS Management", "Business Administration"],
+                        "Arts & Sciences": ["Communication", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics"],
+                        "Graduate Studies": ["MS Fisheries", "MS Marine Science", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "Silliman University", 
+                    domains: ["su.edu.ph"], 
+                    web_pages: ["https://su.edu.ph/"],
+                    courses: {
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics", "Physics", "Philosophy"],
+                        "Business": ["Accountancy", "Business Administration", "Economics", "Hospitality Management", "Tourism Management"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electrical Engineering"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Health Sciences": ["Nursing", "Medical Technology", "Physical Therapy", "Public Health"],
+                        "Divinity": ["Bachelor of Divinity", "Ministry"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "University of St. La Salle", 
+                    domains: ["usls.edu.ph"], 
+                    web_pages: ["https://www.usls.edu.ph/"],
+                    courses: {
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Economics", "Hospitality Management"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electrical Engineering", "Industrial Engineering", "Mechanical Engineering"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Biology", "Chemistry", "Mathematics"],
+                        "Health Sciences": ["Nursing", "Medical Technology"],
+                        "Graduate Studies": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "Central Philippine University", 
+                    domains: ["cpu.edu.ph"], 
+                    web_pages: ["https://cpu.edu.ph/"],
+                    courses: {
+                        "Theology": ["Bachelor of Theology", "Divinity"],
+                        "Business": ["Accountancy", "Business Administration", "Economics", "Hospitality Management"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Computer Engineering", "Electrical Engineering", "Mechanical Engineering"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Biology", "Chemistry", "Mathematics"],
+                        "Health Sciences": ["Nursing", "Medical Technology", "Pharmacy"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MBA", "MA/MS Programs", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "University of San Jose - Recoletos", 
+                    domains: ["usjr.edu.ph"], 
+                    web_pages: ["https://usjr.edu.ph/"],
+                    courses: {
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
+                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering", "Industrial Engineering"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics"],
+                        "Health Sciences": ["Nursing", "Medical Technology", "Pharmacy"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "West Visayas State University", 
+                    domains: ["wvsu.edu.ph"], 
+                    web_pages: ["https://wvsu.edu.ph/"],
+                    courses: {
+                        "Education": ["BEEd", "BSEd majors", "BPEd", "Doctor of Education"],
+                        "Health Sciences": ["Medicine", "Nursing", "Medical Technology", "Physical Therapy", "Pharmacy"],
+                        "Business": ["Accountancy", "Business Administration", "Economics"],
+                        "Arts & Sciences": ["Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics"],
+                        "Information Technology": ["BSIT", "Computer Science"],
+                        "Graduate Studies": ["MA/MS Programs", "PhD Programs", "MBA", "MPA"]
+                    }
+                },
+                { 
+                    name: "Leyte Normal University", 
+                    domains: ["lnu.edu.ph"], 
+                    web_pages: ["https://lnu.edu.ph/"],
+                    courses: {
+                        "Teacher Education": ["BEEd", "BSEd majors", "BPEd", "Doctor of Education"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Mathematics"],
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship"],
+                        "Information Technology": ["BSIT", "Computer Science"],
+                        "Graduate Studies": ["MA Education", "MA Psychology", "PhD Education"]
+                    }
+                },
+                { 
+                    name: "Visayas State University", 
+                    domains: ["vsu.edu.ph"], 
+                    web_pages: ["https://www.vsu.edu.ph/"],
+                    courses: {
+                        "Agriculture": ["BS Agriculture", "Agricultural Engineering", "Agribusiness"],
+                        "Veterinary Medicine": ["Doctor of Veterinary Medicine"],
+                        "Fisheries": ["BS Fisheries", "Aquaculture"],
+                        "Engineering": ["Civil Engineering", "Agricultural Engineering"],
+                        "Education": ["BEEd", "BSEd majors"],
+                        "Arts & Sciences": ["Biology", "Chemistry", "Mathematics", "Psychology"],
+                        "Graduate Studies": ["MS/PhD in Agriculture", "MS Fisheries", "PhD Programs"]
+                    }
+                },
+                
+                // --- MINDANAO ---
+                { 
+                    name: "University of the Philippines Mindanao", 
+                    domains: ["upmin.edu.ph"], 
+                    web_pages: ["https://www.upmin.edu.ph/"],
+                    courses: {
+                        "Agriculture": ["BS Agriculture", "Agribusiness Economics"],
+                        "Food Science": ["BS Food Technology"],
+                        "Computer Science": ["BS Computer Science"],
+                        "Communication": ["BA Communication Arts"],
+                        "Biology": ["BS Biology"],
+                        "Mathematics": ["BS Applied Mathematics"],
+                        "Graduate Studies": ["MS Tropical Agriculture", "MS Food Science"]
+                    }
+                },
+                { 
+                    name: "Ateneo de Davao University", 
+                    domains: ["addu.edu.ph"], 
+                    web_pages: ["https://www.addu.edu.ph/"],
+                    courses: {
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Economics", "Hospitality Management", "Tourism Management"],
+                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electronics Engineering", "Industrial Engineering"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MBA", "MPA", "MS Programs", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "Mindanao State University", 
+                    domains: ["msumain.edu.ph"], 
+                    web_pages: ["https://www.msumain.edu.ph/"],
+                    courses: {
+                        "Agriculture": ["BS Agriculture", "Agricultural Engineering"],
+                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Electrical Engineering", "Mechanical Engineering"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Business": ["Accountancy", "Business Administration", "Economics"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics", "Physics"],
+                        "Health Sciences": ["Medicine", "Nursing", "Medical Technology"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MS/PhD Programs", "MBA", "MPA"]
+                    }
+                },
+                { 
+                    name: "Mindanao State University - Iligan Institute of Technology", 
+                    domains: ["msuiit.edu.ph"], 
+                    web_pages: ["https://www.msuiit.edu.ph/"],
+                    courses: {
+                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering", "Metallurgical Engineering"],
+                        "Science": ["Biology", "Chemistry", "Mathematics", "Physics", "Marine Biology"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Business": ["Accountancy", "Business Administration", "Economics"],
+                        "Education": ["BEEd", "BSEd majors"],
+                        "Arts & Sciences": ["Psychology", "Political Science", "Sociology", "Communication"],
+                        "Graduate Studies": ["MS/PhD Engineering", "MS/PhD Science", "MBA"]
+                    }
+                },
+                { 
+                    name: "Xavier University", 
+                    domains: ["xu.edu.ph"], 
+                    web_pages: ["https://www.xu.edu.ph/"],
+                    courses: {
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Economics", "Hospitality Management", "Tourism Management"],
+                        "Engineering": ["Civil Engineering", "Chemical Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Industrial Engineering", "Mechanical Engineering"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Health Sciences": ["Nursing", "Medical Technology"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MBA", "MPA", "MS Programs", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "University of Mindanao", 
+                    domains: ["umindanao.edu.ph"], 
+                    web_pages: ["https://www.umindanao.edu.ph/"],
+                    courses: {
+                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering", "Mechanical Engineering", "Industrial Engineering"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Economics", "Hospitality Management", "Tourism Management"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics"],
+                        "Health Sciences": ["Nursing", "Medical Technology", "Pharmacy"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "University of the Immaculate Conception", 
+                    domains: ["uic.edu.ph"], 
+                    web_pages: ["https://www.uic.edu.ph/"],
+                    courses: {
+                        "Health Sciences": ["Nursing", "Medical Technology", "Pharmacy", "Physical Therapy", "Radiologic Technology"],
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
+                        "Education": ["BEEd", "BSEd majors"],
+                        "Arts & Sciences": ["Psychology", "Communication", "Biology", "Mathematics"],
+                        "Information Technology": ["BSIT", "Computer Science"],
+                        "Graduate Studies": ["MBA", "MS Nursing", "MA Education"]
+                    }
+                },
+                { 
+                    name: "Western Mindanao State University", 
+                    domains: ["wmsu.edu.ph"], 
+                    web_pages: ["https://wmsu.edu.ph/"],
+                    courses: {
+                        "Engineering": ["Civil Engineering", "Electrical Engineering", "Mechanical Engineering"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Business": ["Accountancy", "Business Administration", "Economics", "Hospitality Management"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Arts & Sciences": ["Psychology", "Political Science", "Sociology", "Biology", "Chemistry", "Mathematics"],
+                        "Health Sciences": ["Nursing", "Medical Technology"],
+                        "Graduate Studies": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
+                    }
+                },
+                { 
+                    name: "Ateneo de Zamboanga University", 
+                    domains: ["adzu.edu.ph"], 
+                    web_pages: ["https://www.adzu.edu.ph/"],
+                    courses: {
+                        "Business": ["Accountancy", "Business Administration", "Entrepreneurship", "Hospitality Management", "Tourism Management"],
+                        "Engineering": ["Civil Engineering", "Computer Engineering", "Electrical Engineering", "Electronics Engineering"],
+                        "Information Technology": ["Computer Science", "Information Technology"],
+                        "Arts & Sciences": ["Communication", "Psychology", "Political Science", "Sociology", "Biology", "Mathematics"],
+                        "Education": ["BEEd", "BSEd majors", "BPEd"],
+                        "Health Sciences": ["Nursing", "Medical Technology"],
+                        "Law": ["Juris Doctor"],
+                        "Graduate Studies": ["MBA", "MPA", "MS Programs"]
+                    }
+                },
+                { 
+                    name: "JH Cerilles State College", 
+                    domains: ["jhcsc.edu.ph"], 
+                    web_pages: ["https://jhcsc.edu.ph/"],
+                    courses: {
+                        "Main Campus": [
+                            "MS Agricultural Development [citation:5]",
+                            "MS Environmental Resources Management",
+                            "BS Agriculture (Crop/Animal Science)",
+                            "BS Forestry",
+                            "BS Environmental Science",
+                            "MA Education (Educational Admin/English/Filipino/Science/Math)",
+                            "BEEd",
+                            "BSEd",
+                            "BS Civil Engineering",
+                            "BS Agricultural Biosystems Engineering",
+                            "BSIT",
+                            "BA English Language Studies",
+                            "BA Political Science",
+                            "BS Social Work"
+                        ],
+                        "Dumingag Campus": [
+                            "MS Agricultural Development",
+                            "BS Agriculture",
+                            "MA Education",
+                            "BEEd",
+                            "BPEd",
+                            "BSEd",
+                            "BSIT",
+                            "BS Criminology",
+                            "BS Industrial Security Management"
+                        ],
+                        "Canuto MS Enerio Campus": [
+                            "BTLEd (Industrial Arts/Home Economics)",
+                            "BTVTEd (Food Service Management/Automotive/Drafting/Electronics/Electrical)",
+                            "BSIT",
+                            "BS Industrial Technology"
+                        ],
+                        "Pagadian Annex": [
+                            "Juris Doctor",
+                            "BSEd",
+                            "BSIT",
+                            "BS Nursing",
+                            "BS Hospitality Management",
+                            "BS Tourism Management",
+                            "BS Entrepreneurship"
+                        ]
+                    }
+                }
+            ];
+
+            // Region Keywords for classification
+            const regionKeywords = {
+                luzon: [
+                    'manila', 'quezon', 'makati', 'pasig', 'taguig', 'mandaluyong', 'marikina', 'pasay', 'paranaque', 
+                    'las pinas', 'muntinlupa', 'navotas', 'malabon', 'valenzuela', 'caloocan', 'san juan',
+                    'tagaytay', 'baguio', 'pampanga', 'laguna', 'cavite', 'bulacan', 'rizal', 'batangas', 
+                    'nueva', 'ilocos', 'cagayan', 'bicol', 'cordillera', 'tarlac', 'zambales', 'pangasinan', 
+                    'la union', 'isabela', 'benguet', 'abra', 'kalinga', 'ifugao', 'apayao',
+                    'aurora', 'bataan', 'nueva ecija', 'quirino', 'marinduque', 'occidental mindoro', 
+                    'oriental mindoro', 'palawan', 'romblon', 'albay', 'camarines norte', 'camarines sur',
+                    'catanduanes', 'masbate', 'sorsogon', 'dlsu', 'ateneo', 'ust', 'up', 'santo tomas', 
+                    'de la salle', 'polytechnic', 'feu', 'adamson', 'university of the east', 'far eastern', 
+                    'east', 'saint louis', 'cordilleras', 'pup', 'tup', 'ceu', 'san beda', 'national university',
+                    'bulacan state', 'bataan peninsula', 'batangas state', 'cavite state'
+                ],
+                visayas: [
+                    'cebu', 'iloilo', 'bacolod', 'tacloban', 'leyte', 'samar', 'negros', 'bohol', 'palawan', 
+                    'aklan', 'capiz', 'antique', 'guimaras', 'siquijor', 'biliran', 'silliman', 'central philippine', 
+                    'cpu', 'san carlos', 'san jose', 'recoletos', 'southern leyte', 'eastern samar', 'northern samar',
+                    'western samar', 'st. paul dumaguete', 'visayas state', 'cebu normal',
+                    'west visayas', 'university of san carlos', 'university of san jose',
+                    'university of the visayas', 'southwestern university', 'negros oriental',
+                    'leyte normal', 'eastern visayas'
+                ],
+                mindanao: [
+                    'davao', 'cagayan de oro', 'zamboanga', 'cotabato', 'butuan', 'surigao', 'lanao', 
+                    'maguindanao', 'basilan', 'sulu', 'tawi-tawi', 'camiguin', 'misamis', 'bukidnon', 
+                    'agusan', 'xavier', 'mindanao state', 'mindanao', 'marawi', 'gensan', 'general santos',
+                    'sarangani', 'sultan kudarat', 'south cotabato', 'north cotabato', 'compostela valley',
+                    'davao oriental', 'davao del sur', 'davao del norte', 'davao occidental',
+                    'zamboanga del norte', 'zamboanga del sur', 'zamboanga sibugay',
+                    'misamis occidental', 'misamis oriental', 'ateneo de davao', 'university of mindanao',
+                    'western mindanao', 'southern mindanao', 'notre dame', 'jh cerilles'
+                ]
+            };
+
+            // Safe accessor for domain / web_page
+            function getDomain(uni) {
+                return uni.domains && uni.domains[0] ? uni.domains[0] : '';
+            }
+            
+            function getWebPage(uni) {
+                return uni.web_pages && uni.web_pages[0] ? uni.web_pages[0] : '';
+            }
+
+            function guessRegion(university) {
+                const domain = getDomain(university);
+                const text = (university.name + ' ' + domain).toLowerCase();
+                
+                for (const [region, keywords] of Object.entries(regionKeywords)) {
+                    if (keywords.some(k => text.includes(k))) return region;
+                }
+                
+                if (text.includes('manila') || text.includes('quezon') || text.includes('baguio')) return 'luzon';
+                if (text.includes('cebu') || text.includes('iloilo')) return 'visayas';
+                if (text.includes('davao') || text.includes('mindanao')) return 'mindanao';
+                
+                return 'luzon';
+            }
+
+            // ----- Map Functions -----
+            function initMap() {
+                if (!map) {
+                    map = L.map(mapContainer).setView([12.8797, 121.7740], 6);
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>'
+                    }).addTo(map);
+                }
+            }
+
+            function updateMap(universities) {
+                if (!map) initMap();
+                
+                mapMarkers.forEach(marker => map.removeLayer(marker));
+                mapMarkers = [];
+                
+                universities.forEach(uni => {
+                    const region = uni.region || guessRegion(uni);
+                    let lat, lng;
+                    
+                    if (region === 'luzon') { lat = 15.5; lng = 121.0; }
+                    else if (region === 'visayas') { lat = 10.5; lng = 123.5; }
+                    else { lat = 7.5; lng = 125.0; }
+                    
+                    lat += (Math.random() - 0.5) * 2.5;
+                    lng += (Math.random() - 0.5) * 2.5;
+                    
+                    const marker = L.marker([lat, lng]).addTo(map)
+                        .bindPopup(`<strong>${uni.name}</strong><br>${region.charAt(0).toUpperCase()+region.slice(1)}`);
+                    mapMarkers.push(marker);
+                });
+
+                if (mapMarkers.length > 0) {
+                    const group = L.featureGroup(mapMarkers);
+                    map.fitBounds(group.getBounds().pad(0.1));
+                }
+            }
+
+            // ----- Initialize with comprehensive university data -----
+            function loadUniversities() {
+                allUniversities = PH_UNIVERSITIES.map(uni => {
+                    return {
+                        ...uni,
+                        region: guessRegion(uni)
+                    };
+                });
+                
+                allUniversities.sort((a, b) => a.name.localeCompare(b.name));
+                
+                applyFiltersAndSort();
+                resultCountSpan.textContent = `${allUniversities.length} universities loaded`;
+            }
+
+            // ----- Apply Filters -----
+            function applyFiltersAndSort() {
+                if (!allUniversities.length) return;
+                
+                let filtered = [...allUniversities];
+                
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                if (searchTerm) {
+                    filtered = filtered.filter(uni => uni.name.toLowerCase().includes(searchTerm));
+                }
+                
+                const region = regionFilter.value;
+                if (region !== 'all') {
+                    filtered = filtered.filter(uni => uni.region === region);
+                }
+                
+                if (showingFavorites) {
+                    filtered = filtered.filter(uni => favorites.includes(uni.name));
+                }
+                
+                filteredUniversities = filtered;
+                resultCountSpan.textContent = `${filtered.length} ${filtered.length === 1 ? 'University' : 'Universities'} found`;
+                
+                renderUniversities(filtered);
+                
+                if (!mapContainer.classList.contains('hidden')) {
+                    updateMap(filtered);
+                }
+            }
+
+            // ----- Render Output -----
+            function renderUniversities(universities) {
+                if (universities.length === 0) {
+                    resultsDiv.innerHTML = `
+                        <div class="state-container">
+                            <i class="fas fa-search" style="font-size:2.5rem; color:var(--text-muted); margin-bottom:1rem;"></i>
+                            <h3>No matches found</h3>
+                            <p style="color:var(--text-muted); margin-top:0.5rem;">Try adjusting your search or filters.</p>
+                        </div>`;
+                    return;
+                }
+                
+                resultsDiv.innerHTML = universities.map((uni, index) => {
+                    const domain = getDomain(uni);
+                    const website = getWebPage(uni);
+                    const isFav = favorites.includes(uni.name);
+                    const regionClass = uni.region || 'luzon';
+                    
+                    return `
+                        <div class="university-card" data-name="${uni.name.replace(/"/g, '&quot;')}" style="animation-delay: ${index * 0.03}s">
+                            <div class="card-header">
+                                <span class="region-badge ${regionClass}">${uni.region}</span>
+                                <button class="favorite-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${uni.name.replace(/'/g, "\\'")}')">
+                                    <i class="${isFav ? 'fas' : 'far'} fa-star"></i>
+                                </button>
+                            </div>
+                            <h3 class="university-name">${uni.name}</h3>
+                            ${domain ? `<a href="http://${domain}" target="_blank" class="university-domain" onclick="event.stopPropagation()"><i class="fas fa-globe"></i> ${domain}</a>` : ''}
+                            
+                            <div class="card-footer">
+                                <span class="location-text"><i class="fas fa-map-marker-alt"></i> Philippines</span>
+                                <span class="course-badge" style="color: var(--accent-primary); font-size:0.85rem;">
+                                    <i class="fas fa-book-open"></i> Click for programs
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                document.querySelectorAll('.university-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        if (e.target.closest('.favorite-btn') || e.target.closest('a')) return;
+                        const uniName = card.dataset.name;
+                        const university = allUniversities.find(u => u.name === uniName);
+                        if (university) showModal(university);
+                    });
+                });
+            }
+
+            // ----- Modal with Course Display -----
+            function showModal(university) {
+                const domain = getDomain(university) || 'N/A';
+                const website = getWebPage(university) || '#';
+                const region = university.region || guessRegion(university);
+                
+                let coursesHtml = '';
+                
+                if (university.courses) {
+                    if (Array.isArray(university.courses)) {
+                        // Handle array format (like JH Cerilles)
+                        coursesHtml = `
+                            <div class="courses-section">
+                                <h3>Academic Programs</h3>
+                                ${university.courses.map(course => `<div class="course-item">${course}</div>`).join('')}
+                            </div>
+                        `;
+                    } else {
+                        // Handle object format with categories
+                        coursesHtml = '<div class="courses-section"><h3>Academic Programs</h3>';
+                        for (const [category, programs] of Object.entries(university.courses)) {
+                            coursesHtml += `
+                                <div class="course-category">
+                                    <h4>${category}</h4>
+                                    <div class="course-list">
+                                        ${programs.map(program => `<span class="course-item">${program}</span>`).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        coursesHtml += '</div>';
+                    }
+                } else {
+                    coursesHtml = '<p class="text-muted">Program information not available. Visit university website for details.</p>';
+                }
+                
+                modalBody.innerHTML = `
+                    <h2>${university.name}</h2>
+                    <div class="modal-info">
+                        <div class="info-group">
+                            <label>Domain</label>
+                            <p>${domain}</p>
+                        </div>
+                        <div class="info-group">
+                            <label>Official Website</label>
+                            <a href="${website}" target="_blank">${website}</a>
+                        </div>
+                        <div class="info-group">
+                            <label>Region</label>
+                            <p>${region.charAt(0).toUpperCase() + region.slice(1)}</p>
+                        </div>
+                    </div>
+                    
+                    ${coursesHtml}
+                    
+                    <div id="modalMap" class="modal-map"></div>
+                `;
+                
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                
+                setTimeout(() => {
+                    const modalMap = L.map('modalMap').setView([12.8797, 121.7740], 6);
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>'
+                    }).addTo(modalMap);
+                    
+                    let lat, lng;
+                    if (region === 'luzon') { lat = 15.5; lng = 121.0; }
+                    else if (region === 'visayas') { lat = 10.5; lng = 123.5; }
+                    else { lat = 7.5; lng = 125.0; }
+                    
+                    L.marker([lat, lng]).addTo(modalMap)
+                        .bindPopup(`<strong>${university.name}</strong>`)
+                        .openPopup();
+                }, 100);
+            }
+
+            function closeModal() {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+
+            // ----- Globals & Listeners -----
+            window.toggleFavorite = function(uniName) {
+                const idx = favorites.indexOf(uniName);
+                if (idx === -1) favorites.push(uniName);
+                else favorites.splice(idx, 1);
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+                applyFiltersAndSort();
+            };
+
+            searchBtn.addEventListener('click', applyFiltersAndSort);
+            searchInput.addEventListener('input', applyFiltersAndSort);
+            regionFilter.addEventListener('change', applyFiltersAndSort);
+            
+            favoritesToggle.addEventListener('click', () => {
+                showingFavorites = !showingFavorites;
+                favoritesToggle.classList.toggle('active-state', showingFavorites);
+                favoritesToggle.innerHTML = showingFavorites 
+                    ? '<i class="fas fa-heart"></i> Favorites Only' 
+                    : '<i class="far fa-heart"></i> Favorites';
+                applyFiltersAndSort();
+            });
+            
+            mapToggle.addEventListener('click', () => {
+                mapContainer.classList.toggle('hidden');
+                const isHidden = mapContainer.classList.contains('hidden');
+                mapToggle.classList.toggle('active-state', !isHidden);
+                mapToggle.innerHTML = isHidden 
+                    ? '<i class="far fa-map"></i> Show Map' 
+                    : '<i class="fas fa-map-marked-alt"></i> Hide Map';
+                
+                if (!isHidden) {
+                    initMap();
+                    updateMap(filteredUniversities);
+                }
+            });
+            
+            closeBtn.addEventListener('click', closeModal);
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+            // Theme Management
+            lightModeBtn.addEventListener('click', () => {
+                document.body.classList.remove('dark-mode');
+                lightModeBtn.classList.add('active');
+                darkModeBtn.classList.remove('active');
+            });
+            
+            darkModeBtn.addEventListener('click', () => {
+                document.body.classList.add('dark-mode');
+                darkModeBtn.classList.add('active');
+                lightModeBtn.classList.remove('active');
+            });
+
+            // Initialize with comprehensive university data
+            loadUniversities();
+        })();
+    </script>
+</body>
+</>html
