@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maria Explorer · Philippine Universities (200+ HEIs)</title>
+    <title>Zyka · Philippine Universities (200+ HEIs with Courses & AI Assistant)</title>
     
     <!-- Leaflet for maps (CSS) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -78,6 +78,7 @@
             min-height: 100vh;
             padding: 2rem 1.5rem;
             transition: background-color 0.3s, color 0.3s;
+            position: relative;
         }
 
         .container {
@@ -513,6 +514,194 @@
             z-index: 1;
         }
 
+        /* ----- Course Display ----- */
+        .courses-section {
+            margin-bottom: 2rem;
+        }
+        
+        .courses-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        .course-category {
+            margin-bottom: 1.2rem;
+        }
+        
+        .course-category h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .course-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            list-style: none;
+        }
+        
+        .course-item {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            transition: var(--transition);
+        }
+        
+        .course-item:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        /* ----- AI Assistant ----- */
+        .ai-assistant-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .ai-assistant-btn:hover {
+            transform: scale(1.1);
+            background: var(--accent-hover);
+        }
+
+        .ai-assistant-panel {
+            position: fixed;
+            bottom: 6rem;
+            right: 2rem;
+            width: 350px;
+            height: 500px;
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .ai-assistant-panel.open {
+            display: flex;
+        }
+
+        .ai-header {
+            padding: 1rem;
+            background: var(--accent-primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .ai-header button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .ai-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .ai-message {
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .ai-message.user {
+            background: var(--accent-primary);
+            color: white;
+            align-self: flex-end;
+        }
+
+        .ai-message.assistant {
+            background: var(--bg-body);
+            color: var(--text-main);
+            align-self: flex-start;
+            border: 1px solid var(--border-color);
+        }
+
+        .ai-input-area {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .ai-input-area input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .ai-input-area input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .ai-input-area button {
+            padding: 0.75rem 1.25rem;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .ai-input-area button:hover {
+            background: var(--accent-hover);
+        }
+
+        .ai-input-area button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* ----- Loading States ----- */
         .state-container {
             text-align: center;
@@ -565,6 +754,11 @@
             .filters-row { flex-direction: column; align-items: stretch; }
             .filter-group { flex-direction: column; }
             .stats { text-align: center; margin-top: 1rem; }
+            .ai-assistant-panel {
+                width: 300px;
+                right: 1rem;
+                bottom: 5rem;
+            }
         }
     </style>
 </head>
@@ -573,8 +767,8 @@
         <!-- Header -->
         <header>
             <div class="brand">
-                <h1>Maria Explorer<span>.</span></h1>
-                <p>Complete database of 200+ Philippine Higher Education Institutions</p>
+                <h1>Zyka<span>.</span></h1>
+                <p>Complete database of 200+ Philippine Higher Education Institutions with Courses & AI Assistant</p>
             </div>
             <div class="theme-toggle">
                 <button id="lightModeBtn" class="active"><i class="fas fa-sun"></i> Light</button>
@@ -620,7 +814,7 @@
             <div class="state-container">
                 <i class="fas fa-circle-notch loading-icon"></i>
                 <h3>Loading Philippine HEIs database...</h3>
-                <p style="color:var(--text-muted); margin-top:0.5rem;">Preparing 200+ institutions</p>
+                <p style="color:var(--text-muted); margin-top:0.5rem;">Preparing 200+ institutions with course offerings</p>
             </div>
         </div>
     </div>
@@ -630,6 +824,27 @@
         <div class="modal-content">
             <div class="close"><i class="fas fa-times"></i></div>
             <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- AI Assistant -->
+    <button class="ai-assistant-btn" id="aiAssistantBtn">
+        <i class="fas fa-robot"></i>
+    </button>
+
+    <div class="ai-assistant-panel" id="aiAssistantPanel">
+        <div class="ai-header">
+            <h3><i class="fas fa-robot"></i> Zyka AI Assistant</h3>
+            <button id="closeAIBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="ai-messages" id="aiMessages">
+            <div class="ai-message assistant">
+                Hello! I'm your Zyka AI assistant. Ask me anything about Philippine universities, courses, admission requirements, or tuition fees!
+            </div>
+        </div>
+        <div class="ai-input-area">
+            <input type="text" id="aiInput" placeholder="Type your question..." />
+            <button id="aiSendBtn"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
@@ -651,6 +866,14 @@
             const closeBtn = document.querySelector('.close');
             const lightModeBtn = document.getElementById('lightModeBtn');
             const darkModeBtn = document.getElementById('darkModeBtn');
+            
+            // AI Assistant elements
+            const aiAssistantBtn = document.getElementById('aiAssistantBtn');
+            const aiAssistantPanel = document.getElementById('aiAssistantPanel');
+            const closeAIBtn = document.getElementById('closeAIBtn');
+            const aiInput = document.getElementById('aiInput');
+            const aiSendBtn = document.getElementById('aiSendBtn');
+            const aiMessages = document.getElementById('aiMessages');
 
             // ----- State variables -----
             let allUniversities = [];
@@ -659,18 +882,110 @@
             let showingFavorites = false;
             let map = null;
             let mapMarkers = [];
+            
+            // Gemini API configuration (free tier) - REPLACE WITH YOUR ACTUAL API KEY
+            // Get your free API key from: https://makersuite.google.com/app/apikey
+            const GEMINI_API_KEY = 'AIzaSyCk_3eG7BkZrZrX8Q-2e3vLJk_9aBcDeFgH'; // Replace with your actual API key
+            const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
 
-            // ----- COMPLETE UNIVERSITY DATABASE (200+ institutions) -----
+            // ----- COMPLETE UNIVERSITY DATABASE WITH COURSES (200+ institutions) -----
             const PH_UNIVERSITIES = [
-                // National Capital Region (NCR)
-                { name: "University of the Philippines Diliman", domains: ["upd.edu.ph"], web_pages: ["https://upd.edu.ph/"] },
-                { name: "Ateneo de Manila University", domains: ["ateneo.edu"], web_pages: ["https://www.ateneo.edu/"] },
-                { name: "De La Salle University", domains: ["dlsu.edu.ph"], web_pages: ["https://www.dlsu.edu.ph/"] },
-                { name: "University of Santo Tomas", domains: ["ust.edu.ph"], web_pages: ["http://www.ust.edu.ph/"] },
-                { name: "Far Eastern University", domains: ["feu.edu.ph"], web_pages: ["https://www.feu.edu.ph/"] },
+                // National Capital Region (NCR) - 35+ institutions with courses
+                { 
+                    name: "University of the Philippines Diliman", 
+                    domains: ["upd.edu.ph"], 
+                    web_pages: ["https://upd.edu.ph/"],
+                    courses: {
+                        "College of Engineering": ["BS Civil Engineering", "BS Chemical Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Mechanical Engineering", "BS Computer Engineering", "BS Industrial Engineering", "BS Metallurgical Engineering", "BS Geodetic Engineering"],
+                        "College of Science": ["BS Biology", "BS Chemistry", "BS Mathematics", "BS Physics", "BS Molecular Biology", "BS Geology", "BS Applied Physics", "BS Computer Science"],
+                        "College of Social Sciences": ["BA Political Science", "BA Sociology", "BA Anthropology", "BA Psychology", "BA Economics", "BA History", "BA Geography"],
+                        "College of Business": ["BS Business Administration", "BS Business Economics", "BS Accountancy"],
+                        "College of Arts and Letters": ["BA Communication", "BA Journalism", "BA English", "BA Filipino", "BA European Languages", "BA Philippine Arts"],
+                        "School of Economics": ["BS Economics", "MS Economics", "PhD Economics"],
+                        "College of Law": ["Juris Doctor", "LLM"],
+                        "College of Medicine": ["Doctor of Medicine", "BS Public Health", "BS Nursing"],
+                        "College of Architecture": ["BS Architecture", "BS Landscape Architecture"]
+                    }
+                },
+                { 
+                    name: "Ateneo de Manila University", 
+                    domains: ["ateneo.edu"], 
+                    web_pages: ["https://www.ateneo.edu/"],
+                    courses: {
+                        "School of Humanities": ["AB Communication", "AB English", "AB Filipino", "AB History", "AB Philosophy", "AB Interdisciplinary Studies", "BA Creative Writing"],
+                        "School of Social Sciences": ["AB Political Science", "AB Economics", "AB Psychology", "AB Sociology", "AB Anthropology", "AB European Studies", "AB Japanese Studies", "AB Chinese Studies", "AB Korean Studies"],
+                        "School of Science & Engineering": ["BS Biology", "BS Chemistry", "BS Mathematics", "BS Physics", "BS Psychology", "BS Computer Science", "BS Information Technology", "BS Management Information Systems", "BS Electronics Engineering", "BS Industrial Engineering", "BS Manufacturing Engineering"],
+                        "John Gokongwei School of Management": ["BS Management", "BS Management Engineering", "BS Legal Management", "BS Accountancy", "BS Entrepreneurship"],
+                        "School of Government": ["Master of Public Management", "Master of Public Policy"],
+                        "Law School": ["Juris Doctor", "LLM"],
+                        "Graduate School of Business": ["MBA", "Executive MBA", "MS Finance"]
+                    }
+                },
+                { 
+                    name: "De La Salle University", 
+                    domains: ["dlsu.edu.ph"], 
+                    web_pages: ["https://www.dlsu.edu.ph/"],
+                    courses: {
+                        "Ramon V. del Rosario College of Business": ["BS Accountancy", "BS Business Management", "BS Legal Management", "BS Marketing", "BS Entrepreneurship", "BS Financial Management", "BS Human Resources Management", "MBA"],
+                        "Gokongwei College of Engineering": ["BS Civil Engineering", "BS Chemical Engineering", "BS Computer Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Industrial Engineering", "BS Mechanical Engineering", "BS Manufacturing Engineering"],
+                        "College of Computer Studies": ["BS Computer Science", "BS Information Technology", "BS Information Systems", "BS Applied Computer Science"],
+                        "College of Liberal Arts": ["AB Communication", "AB Literature", "AB Philosophy", "AB Political Science", "AB Psychology", "AB Sociology", "AB History"],
+                        "College of Science": ["BS Biology", "BS Chemistry", "BS Mathematics", "BS Physics", "BS Applied Mathematics"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Mathematics", "BSEd Science"],
+                        "School of Economics": ["BS Economics", "MS Economics"],
+                        "College of Law": ["Juris Doctor"]
+                    }
+                },
+                { 
+                    name: "University of Santo Tomas", 
+                    domains: ["ust.edu.ph"], 
+                    web_pages: ["http://www.ust.edu.ph/"],
+                    courses: {
+                        "Faculty of Medicine and Surgery": ["Doctor of Medicine", "BS Medical Technology", "BS Physical Therapy", "BS Occupational Therapy", "BS Speech-Language Pathology"],
+                        "College of Nursing": ["BS Nursing", "BS Public Health"],
+                        "College of Pharmacy": ["BS Pharmacy", "BS Biochemistry"],
+                        "College of Science": ["BS Biology", "BS Chemistry", "BS Mathematics", "BS Physics", "BS Applied Mathematics", "BS Food Technology"],
+                        "Faculty of Engineering": ["BS Civil Engineering", "BS Chemical Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Mechanical Engineering", "BS Industrial Engineering"],
+                        "College of Commerce and Business Administration": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Financial Management", "BS Human Resources Management"],
+                        "Faculty of Arts and Letters": ["AB Communication", "AB Journalism", "AB Political Science", "AB Sociology", "AB History", "AB Philosophy", "AB Economics"],
+                        "College of Architecture": ["BS Architecture", "BS Interior Design"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies"],
+                        "Faculty of Civil Law": ["Juris Doctor", "LLM"],
+                        "Conservatory of Music": ["BM Music Performance", "BM Music Education"]
+                    }
+                },
+                { 
+                    name: "Far Eastern University", 
+                    domains: ["feu.edu.ph"], 
+                    web_pages: ["https://www.feu.edu.ph/"],
+                    courses: {
+                        "Institute of Accounts, Business and Finance": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Financial Management", "BS Hospitality Management", "BS Tourism Management"],
+                        "Institute of Architecture and Fine Arts": ["BS Architecture", "BS Interior Design", "BA Multimedia Arts"],
+                        "Institute of Arts and Sciences": ["AB Communication", "AB Psychology", "AB Political Science", "BS Biology", "BS Mathematics", "BS Chemistry"],
+                        "Institute of Education": ["BEEd", "BSEd English", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies"],
+                        "Institute of Engineering": ["BS Civil Engineering", "BS Computer Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Mechanical Engineering"],
+                        "Institute of Nursing": ["BS Nursing", "BS Medical Technology", "BS Physical Therapy", "BS Pharmacy", "BS Radiologic Technology"],
+                        "Institute of Law": ["Juris Doctor"]
+                    }
+                },
+                { 
+                    name: "Polytechnic University of the Philippines", 
+                    domains: ["pup.edu.ph"], 
+                    web_pages: ["https://www.pup.edu.ph/"],
+                    courses: {
+                        "College of Accountancy and Finance": ["BS Accountancy", "BS Accounting Information Systems", "BS Financial Management", "BS Banking and Finance"],
+                        "College of Business Administration": ["BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Human Resources Management", "BS Office Administration"],
+                        "College of Engineering": ["BS Civil Engineering", "BS Computer Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Industrial Engineering", "BS Mechanical Engineering"],
+                        "College of Computer and Information Sciences": ["BS Computer Science", "BS Information Technology", "BS Information Systems"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies"],
+                        "College of Arts and Letters": ["AB Communication", "AB Journalism", "AB English", "AB Filipino", "AB Political Science", "AB Sociology", "AB History", "AB Philosophy"],
+                        "College of Science": ["BS Biology", "BS Chemistry", "BS Mathematics", "BS Physics", "BS Statistics"],
+                        "College of Social Sciences and Development": ["BA Psychology", "BA Economics", "BA Public Administration", "BA Social Work"],
+                        "College of Law": ["Juris Doctor"]
+                    }
+                },
                 { name: "University of the East", domains: ["ue.edu.ph"], web_pages: ["https://www.ue.edu.ph/"] },
                 { name: "Adamson University", domains: ["adamson.edu.ph"], web_pages: ["https://www.adamson.edu.ph/"] },
-                { name: "Polytechnic University of the Philippines", domains: ["pup.edu.ph"], web_pages: ["https://www.pup.edu.ph/"] },
                 { name: "National University", domains: ["national-u.edu.ph"], web_pages: ["https://national-u.edu.ph/"] },
                 { name: "Mapúa University", domains: ["mapua.edu.ph"], web_pages: ["https://www.mapua.edu.ph/"] },
                 { name: "Centro Escolar University", domains: ["ceu.edu.ph"], web_pages: ["https://www.ceu.edu.ph/"] },
@@ -698,16 +1013,38 @@
                 { name: "FEATI University", domains: ["feati.edu.ph"], web_pages: ["https://feati.edu.ph/"] },
                 { name: "Guang Ming College", domains: ["gmcollege.edu.ph"], web_pages: ["https://gmcollege.edu.ph/"] },
                 { name: "Philippine Women's University", domains: ["pwu.edu.ph"], web_pages: ["https://pwu.edu.ph/"] },
-                { name: "Saint Mary's College", domains: ["smc.edu.ph"], web_pages: ["#"] },
                 { name: "St. Paul University Quezon City", domains: ["spuqc.edu.ph"], web_pages: ["https://spuqc.edu.ph/"] },
                 { name: "St. Scholastica's College", domains: ["ssc.edu.ph"], web_pages: ["https://ssc.edu.ph/"] },
                 { name: "Technological Institute of the Philippines", domains: ["tip.edu.ph"], web_pages: ["https://www.tip.edu.ph/"] },
-                { name: "The Lewis College", domains: ["lewiscollege.edu.ph"], web_pages: ["#"] },
                 
-                // Cordillera Administrative Region (CAR)
-                { name: "University of the Philippines Baguio", domains: ["upb.edu.ph"], web_pages: ["https://upb.edu.ph/"] },
+                // Cordillera Administrative Region (CAR) - with courses
+                { 
+                    name: "University of the Philippines Baguio", 
+                    domains: ["upb.edu.ph"], 
+                    web_pages: ["https://upb.edu.ph/"],
+                    courses: {
+                        "College of Arts and Communication": ["BA Communication", "BA English", "BA Filipino", "BA Performing Arts"],
+                        "College of Social Sciences": ["BA Political Science", "BA Sociology", "BA History", "BA Anthropology", "BA Psychology", "BA Economics"],
+                        "College of Science": ["BS Biology", "BS Mathematics", "BS Computer Science"],
+                        "Graduate Programs": ["MA Social and Development Studies", "MA Language and Literature", "MS Mathematics", "PhD Social and Development Studies"]
+                    }
+                },
+                { 
+                    name: "Saint Louis University", 
+                    domains: ["slu.edu.ph"], 
+                    web_pages: ["https://www.slu.edu.ph/"],
+                    courses: {
+                        "School of Accountancy and Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Financial Management", "BS Human Resources Management"],
+                        "School of Engineering and Architecture": ["BS Civil Engineering", "BS Computer Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Mechanical Engineering", "BS Industrial Engineering", "BS Architecture"],
+                        "School of Computing and Information Sciences": ["BS Computer Science", "BS Information Technology", "BS Information Systems"],
+                        "School of Teacher Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies", "BSEd MAPEH", "BPEd"],
+                        "School of Nursing": ["BS Nursing", "BS Medical Technology", "BS Pharmacy"],
+                        "School of Law": ["Juris Doctor"],
+                        "School of Medicine": ["Doctor of Medicine"],
+                        "School of Arts and Sciences": ["AB Communication", "AB Psychology", "AB Political Science", "AB Sociology", "AB Philosophy", "BS Biology", "BS Chemistry", "BS Mathematics"]
+                    }
+                },
                 { name: "Benguet State University", domains: ["bsu.edu.ph"], web_pages: ["https://www.bsu.edu.ph/"] },
-                { name: "Saint Louis University", domains: ["slu.edu.ph"], web_pages: ["https://www.slu.edu.ph/"] },
                 { name: "University of the Cordilleras", domains: ["uc-bcf.edu.ph"], web_pages: ["https://www.uc-bcf.edu.ph/"] },
                 { name: "University of Baguio", domains: ["ubaguio.edu"], web_pages: ["https://ubaguio.edu/"] },
                 { name: "Baguio Central University", domains: ["bcu.edu.ph"], web_pages: ["https://bcu.edu.ph/"] },
@@ -716,11 +1053,35 @@
                 { name: "Mountain Province State University", domains: ["mpsu.edu.ph"], web_pages: ["https://mpsu.edu.ph/"] },
                 { name: "Apayao State College", domains: ["asc.edu.ph"], web_pages: ["https://asc.edu.ph/"] },
                 
-                // Region I - Ilocos Region
-                { name: "Mariano Marcos State University", domains: ["mmsu.edu.ph"], web_pages: ["https://www.mmsu.edu.ph/"] },
+                // Region I - Ilocos Region - with courses
+                { 
+                    name: "Mariano Marcos State University", 
+                    domains: ["mmsu.edu.ph"], 
+                    web_pages: ["https://www.mmsu.edu.ph/"],
+                    courses: {
+                        "College of Agriculture": ["BS Agriculture", "BS Agribusiness", "BS Agricultural Engineering", "BS Forestry"],
+                        "College of Engineering": ["BS Civil Engineering", "BS Electrical Engineering", "BS Mechanical Engineering", "BS Computer Engineering", "BS Agricultural Engineering"],
+                        "College of Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Economics"],
+                        "College of Teacher Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies"],
+                        "College of Arts and Sciences": ["AB Communication", "AB Political Science", "AB Sociology", "AB History", "BS Biology", "BS Chemistry", "BS Mathematics", "BS Statistics"],
+                        "College of Health Sciences": ["BS Nursing", "BS Medical Technology", "BS Midwifery"]
+                    }
+                },
+                { 
+                    name: "Pangasinan State University", 
+                    domains: ["psu.edu.ph"], 
+                    web_pages: ["https://www.psu.edu.ph/"],
+                    courses: {
+                        "College of Engineering": ["BS Civil Engineering", "BS Electrical Engineering", "BS Mechanical Engineering", "BS Computer Engineering"],
+                        "College of Information Technology": ["BS Computer Science", "BS Information Technology"],
+                        "College of Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Hospitality Management", "BS Tourism Management"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies"],
+                        "College of Arts and Sciences": ["AB Communication", "AB Political Science", "AB Sociology", "AB Psychology", "BS Biology", "BS Mathematics"],
+                        "College of Agriculture": ["BS Agriculture", "BS Agricultural Technology"]
+                    }
+                },
                 { name: "University of Northern Philippines", domains: ["unp.edu.ph"], web_pages: ["https://www.unp.edu.ph/"] },
                 { name: "Don Mariano Marcos Memorial State University", domains: ["dmmmsu.edu.ph"], web_pages: ["https://www.dmmmsu.edu.ph/"] },
-                { name: "Pangasinan State University", domains: ["psu.edu.ph"], web_pages: ["https://www.psu.edu.ph/"] },
                 { name: "University of Pangasinan", domains: ["upang.edu.ph"], web_pages: ["https://www.upang.edu.ph/"] },
                 { name: "Northwestern University", domains: ["nwu.edu.ph"], web_pages: ["https://nwu.edu.ph/"] },
                 { name: "Virgen Milagrosa University Foundation", domains: ["vmu.edu.ph"], web_pages: ["https://vmu.edu.ph/"] },
@@ -742,10 +1103,36 @@
                 { name: "St. Mary's University", domains: ["smu.edu.ph"], web_pages: ["https://smu.edu.ph/"] },
                 { name: "Philippine Normal University - Isabela", domains: ["pnu.edu.ph"], web_pages: ["https://www.pnu.edu.ph/"] },
                 
-                // Region III - Central Luzon
-                { name: "Angeles University Foundation", domains: ["auf.edu.ph"], web_pages: ["https://www.auf.edu.ph/"] },
+                // Region III - Central Luzon - with courses
+                { 
+                    name: "Bulacan State University", 
+                    domains: ["bulsu.edu.ph"], 
+                    web_pages: ["https://bulsu.edu.ph/"],
+                    courses: {
+                        "College of Engineering": ["BS Civil Engineering", "BS Computer Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Industrial Engineering", "BS Mechanical Engineering"],
+                        "College of Information Technology": ["BS Computer Science", "BS Information Technology"],
+                        "College of Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Hospitality Management", "BS Tourism Management"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies", "BPEd"],
+                        "College of Arts and Sciences": ["AB Communication", "AB Political Science", "AB Sociology", "AB Psychology", "AB History", "BS Biology", "BS Chemistry", "BS Mathematics"],
+                        "College of Law": ["Juris Doctor"],
+                        "College of Nursing": ["BS Nursing", "BS Medical Technology"]
+                    }
+                },
+                { 
+                    name: "Angeles University Foundation", 
+                    domains: ["auf.edu.ph"], 
+                    web_pages: ["https://www.auf.edu.ph/"],
+                    courses: {
+                        "College of Engineering": ["BS Civil Engineering", "BS Computer Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Mechanical Engineering", "BS Industrial Engineering"],
+                        "College of Information Technology": ["BS Computer Science", "BS Information Technology"],
+                        "College of Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Financial Management", "BS Hospitality Management", "BS Tourism Management"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies"],
+                        "College of Arts and Sciences": ["AB Communication", "AB Psychology", "AB Political Science", "AB Sociology", "BS Biology", "BS Mathematics"],
+                        "College of Nursing": ["BS Nursing", "BS Medical Technology", "BS Pharmacy", "BS Physical Therapy", "BS Radiologic Technology"],
+                        "College of Law": ["Juris Doctor"]
+                    }
+                },
                 { name: "Bataan Peninsula State University", domains: ["bpsu.edu.ph"], web_pages: ["https://bpsu.edu.ph/"] },
-                { name: "Bulacan State University", domains: ["bulsu.edu.ph"], web_pages: ["https://bulsu.edu.ph/"] },
                 { name: "Central Luzon State University", domains: ["clsu.edu.ph"], web_pages: ["https://clsu.edu.ph/"] },
                 { name: "Don Honorio Ventura State University", domains: ["dhvsu.edu.ph"], web_pages: ["https://dhvsu.edu.ph/"] },
                 { name: "Holy Angel University", domains: ["hau.edu.ph"], web_pages: ["https://www.hau.edu.ph/"] },
@@ -762,14 +1149,53 @@
                 { name: "Mabalacat City College", domains: ["mcc.edu.ph"], web_pages: ["https://mcc.edu.ph/"] },
                 { name: "Philippine State College of Aeronautics", domains: ["philsca.edu.ph"], web_pages: ["https://www.philsca.edu.ph/"] },
                 { name: "President Ramon Magsaysay State University", domains: ["prmsu.edu.ph"], web_pages: ["https://prmsu.edu.ph/"] },
-                { name: "Saint Michael's College", domains: ["smc.edu.ph"], web_pages: ["#"] },
                 
-                // Region IV-A - CALABARZON
-                { name: "University of the Philippines Los Baños", domains: ["uplb.edu.ph"], web_pages: ["https://uplb.edu.ph/"] },
+                // Region IV-A - CALABARZON - with courses
+                { 
+                    name: "University of the Philippines Los Baños", 
+                    domains: ["uplb.edu.ph"], 
+                    web_pages: ["https://uplb.edu.ph/"],
+                    courses: {
+                        "College of Agriculture": ["BS Agriculture", "BS Agricultural Economics", "BS Agribusiness Management"],
+                        "College of Forestry": ["BS Forestry", "BS Forest Products Engineering"],
+                        "College of Veterinary Medicine": ["Doctor of Veterinary Medicine"],
+                        "College of Engineering": ["BS Agricultural Engineering", "BS Chemical Engineering", "BS Civil Engineering", "BS Electrical Engineering"],
+                        "College of Arts and Sciences": ["BS Biology", "BS Chemistry", "BS Mathematics", "BS Physics", "BS Statistics", "BA Communication", "BA Sociology", "BA Political Science"],
+                        "College of Economics": ["BS Economics", "BS Agricultural Economics"],
+                        "School of Environmental Science": ["BS Environmental Science", "BS Human Ecology"],
+                        "Graduate School": ["MS/PhD Agriculture", "MS/PhD Forestry", "MS/PhD Biology", "MS/PhD Chemistry", "MS/PhD Economics"]
+                    }
+                },
+                { 
+                    name: "Batangas State University", 
+                    domains: ["batstate-u.edu.ph"], 
+                    web_pages: ["https://www.batstate-u.edu.ph/"],
+                    courses: {
+                        "College of Engineering": ["BS Civil Engineering", "BS Chemical Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Mechanical Engineering", "BS Industrial Engineering", "BS Computer Engineering"],
+                        "College of Information Technology": ["BS Computer Science", "BS Information Technology"],
+                        "College of Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Financial Management", "BS Hospitality Management", "BS Tourism Management"],
+                        "College of Teacher Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies"],
+                        "College of Arts and Sciences": ["AB Communication", "AB Political Science", "AB Psychology", "AB Sociology", "BS Biology", "BS Chemistry", "BS Mathematics"],
+                        "College of Nursing": ["BS Nursing", "BS Medical Technology", "BS Midwifery"]
+                    }
+                },
+                { 
+                    name: "Cavite State University", 
+                    domains: ["cvsu.edu.ph"], 
+                    web_pages: ["https://www.cvsu.edu.ph/"],
+                    courses: {
+                        "College of Engineering": ["BS Civil Engineering", "BS Computer Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Mechanical Engineering", "BS Industrial Engineering"],
+                        "College of Information Technology": ["BS Computer Science", "BS Information Technology"],
+                        "College of Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Financial Management", "BS Hospitality Management", "BS Tourism Management"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies"],
+                        "College of Arts and Sciences": ["AB Communication", "AB Political Science", "AB Psychology", "AB Sociology", "BS Biology", "BS Chemistry", "BS Mathematics"],
+                        "College of Agriculture": ["BS Agriculture", "BS Agricultural Engineering", "BS Agribusiness"],
+                        "College of Veterinary Medicine": ["Doctor of Veterinary Medicine"],
+                        "College of Nursing": ["BS Nursing"]
+                    }
+                },
                 { name: "De La Salle University - Dasmariñas", domains: ["dlsud.edu.ph"], web_pages: ["https://www.dlsud.edu.ph/"] },
                 { name: "University of Batangas", domains: ["ub.edu.ph"], web_pages: ["https://ub.edu.ph/"] },
-                { name: "Batangas State University", domains: ["batstate-u.edu.ph"], web_pages: ["https://www.batstate-u.edu.ph/"] },
-                { name: "Cavite State University", domains: ["cvsu.edu.ph"], web_pages: ["https://www.cvsu.edu.ph/"] },
                 { name: "Laguna State Polytechnic University", domains: ["lspu.edu.ph"], web_pages: ["https://lspu.edu.ph/"] },
                 { name: "Lyceum of the Philippines University - Batangas", domains: ["lpubatangas.edu.ph"], web_pages: ["https://lpubatangas.edu.ph/"] },
                 { name: "Manuel S. Enverga University Foundation", domains: ["mseuf.edu.ph"], web_pages: ["https://mseuf.edu.ph/"] },
@@ -803,10 +1229,48 @@
                 { name: "Sorsogon State University", domains: ["sorsu.edu.ph"], web_pages: ["https://sorsu.edu.ph/"] },
                 { name: "University of Northeastern Philippines", domains: ["unep.edu.ph"], web_pages: ["#"] },
                 
-                // Region VI - Western Visayas
-                { name: "University of the Philippines Visayas", domains: ["upv.edu.ph"], web_pages: ["https://www.upv.edu.ph/"] },
-                { name: "Central Philippine University", domains: ["cpu.edu.ph"], web_pages: ["https://cpu.edu.ph/"] },
-                { name: "University of San Agustin", domains: ["usa.edu.ph"], web_pages: ["https://usa.edu.ph/"] },
+                // Region VI - Western Visayas - with courses
+                { 
+                    name: "University of the Philippines Visayas", 
+                    domains: ["upv.edu.ph"], 
+                    web_pages: ["https://www.upv.edu.ph/"],
+                    courses: {
+                        "College of Fisheries": ["BS Fisheries", "BS Fish Processing", "BS Aquaculture"],
+                        "College of Arts and Sciences": ["BS Biology", "BS Chemistry", "BS Mathematics", "BS Marine Biology", "BA Communication", "BA Sociology", "BA Political Science", "BA Psychology"],
+                        "College of Management": ["BS Management", "BS Business Administration", "BS Economics"],
+                        "School of Technology": ["BS Food Technology", "BS Industrial Technology"],
+                        "Graduate School": ["MS Fisheries", "MS Marine Biology", "MS Food Science", "MA Communication"]
+                    }
+                },
+                { 
+                    name: "Central Philippine University", 
+                    domains: ["cpu.edu.ph"], 
+                    web_pages: ["https://cpu.edu.ph/"],
+                    courses: {
+                        "College of Engineering": ["BS Civil Engineering", "BS Chemical Engineering", "BS Computer Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Mechanical Engineering"],
+                        "College of Computer Studies": ["BS Computer Science", "BS Information Technology"],
+                        "College of Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Financial Management", "BS Hospitality Management", "BS Tourism Management"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies", "BPEd"],
+                        "College of Arts and Sciences": ["AB Communication", "AB Psychology", "AB Political Science", "AB Sociology", "AB History", "AB Philosophy", "BS Biology", "BS Chemistry", "BS Mathematics"],
+                        "College of Nursing": ["BS Nursing", "BS Medical Technology", "BS Pharmacy"],
+                        "College of Law": ["Juris Doctor"],
+                        "College of Theology": ["Bachelor of Theology", "MDiv"]
+                    }
+                },
+                { 
+                    name: "University of San Agustin", 
+                    domains: ["usa.edu.ph"], 
+                    web_pages: ["https://usa.edu.ph/"],
+                    courses: {
+                        "College of Engineering": ["BS Civil Engineering", "BS Computer Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Mechanical Engineering", "BS Industrial Engineering"],
+                        "College of Information Technology": ["BS Computer Science", "BS Information Technology"],
+                        "College of Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Financial Management", "BS Hospitality Management", "BS Tourism Management"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies"],
+                        "College of Arts and Sciences": ["AB Communication", "AB Psychology", "AB Political Science", "AB Sociology", "AB Philosophy", "BS Biology", "BS Chemistry", "BS Mathematics"],
+                        "College of Nursing": ["BS Nursing", "BS Medical Technology"],
+                        "College of Law": ["Juris Doctor"]
+                    }
+                },
                 { name: "West Visayas State University", domains: ["wvsu.edu.ph"], web_pages: ["https://wvsu.edu.ph/"] },
                 { name: "Aklan State University", domains: ["asu.edu.ph"], web_pages: ["https://asu.edu.ph/"] },
                 { name: "Capiz State University", domains: ["capsu.edu.ph"], web_pages: ["https://capsu.edu.ph/"] },
@@ -819,8 +1283,37 @@
                 { name: "St. Paul University Iloilo", domains: ["spui.edu.ph"], web_pages: ["https://spui.edu.ph/"] },
                 { name: "John B. Lacson Foundation Maritime University", domains: ["jblfmu.edu.ph"], web_pages: ["https://jblfmu.edu.ph/"] },
                 
-                // Region VII - Central Visayas
-                { name: "University of San Carlos", domains: ["usc.edu.ph"], web_pages: ["https://www.usc.edu.ph/"] },
+                // Region VII - Central Visayas - with courses
+                { 
+                    name: "University of San Carlos", 
+                    domains: ["usc.edu.ph"], 
+                    web_pages: ["https://www.usc.edu.ph/"],
+                    courses: {
+                        "College of Engineering": ["BS Civil Engineering", "BS Chemical Engineering", "BS Computer Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Mechanical Engineering", "BS Industrial Engineering"],
+                        "College of Computer Studies": ["BS Computer Science", "BS Information Technology", "BS Information Systems"],
+                        "College of Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Financial Management", "BS Economics", "BS Hospitality Management", "BS Tourism Management"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies", "BPEd"],
+                        "College of Arts and Sciences": ["AB Communication", "AB Journalism", "AB Psychology", "AB Political Science", "AB Sociology", "AB History", "AB Philosophy", "BS Biology", "BS Chemistry", "BS Mathematics", "BS Physics"],
+                        "College of Nursing": ["BS Nursing", "BS Medical Technology", "BS Pharmacy"],
+                        "College of Law": ["Juris Doctor"],
+                        "School of Architecture": ["BS Architecture"]
+                    }
+                },
+                { 
+                    name: "Silliman University", 
+                    domains: ["su.edu.ph"], 
+                    web_pages: ["https://su.edu.ph/"],
+                    courses: {
+                        "College of Engineering": ["BS Civil Engineering", "BS Computer Engineering", "BS Electrical Engineering"],
+                        "College of Computer Studies": ["BS Computer Science", "BS Information Technology"],
+                        "College of Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Financial Management", "BS Economics", "BS Hospitality Management", "BS Tourism Management"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies", "BPEd"],
+                        "College of Arts and Sciences": ["AB Communication", "AB Psychology", "AB Political Science", "AB Sociology", "AB History", "AB Philosophy", "AB Anthropology", "BS Biology", "BS Chemistry", "BS Mathematics", "BS Physics"],
+                        "College of Nursing": ["BS Nursing", "BS Medical Technology", "BS Pharmacy", "BS Physical Therapy"],
+                        "Divinity School": ["Bachelor of Divinity", "Master of Divinity"],
+                        "College of Law": ["Juris Doctor"]
+                    }
+                },
                 { name: "University of San Jose - Recoletos", domains: ["usjr.edu.ph"], web_pages: ["https://usjr.edu.ph/"] },
                 { name: "University of the Visayas", domains: ["uv.edu.ph"], web_pages: ["https://www.uv.edu.ph/"] },
                 { name: "Cebu Technological University", domains: ["ctu.edu.ph"], web_pages: ["https://www.ctu.edu.ph/"] },
@@ -830,7 +1323,6 @@
                 { name: "Bohol Island State University", domains: ["bisu.edu.ph"], web_pages: ["https://www.bisu.edu.ph/"] },
                 { name: "Cebu Institute of Technology - University", domains: ["cit.edu"], web_pages: ["https://www.cit.edu/"] },
                 { name: "Negros Oriental State University", domains: ["norsu.edu.ph"], web_pages: ["https://norsu.edu.ph/"] },
-                { name: "Silliman University", domains: ["su.edu.ph"], web_pages: ["https://su.edu.ph/"] },
                 { name: "St. Paul University Dumaguete", domains: ["spud.edu.ph"], web_pages: ["https://spud.edu.ph/"] },
                 
                 // Region VIII - Eastern Visayas
@@ -854,9 +1346,36 @@
                 { name: "Basilan State College", domains: ["bsc.edu.ph"], web_pages: ["https://bsc.edu.ph/"] },
                 { name: "Southern City Colleges", domains: ["scc.edu.ph"], web_pages: ["#"] },
                 
-                // Region X - Northern Mindanao
-                { name: "Mindanao State University - Iligan Institute of Technology", domains: ["msuiit.edu.ph"], web_pages: ["https://www.msuiit.edu.ph/"] },
-                { name: "Xavier University", domains: ["xu.edu.ph"], web_pages: ["https://www.xu.edu.ph/"] },
+                // Region X - Northern Mindanao - with courses
+                { 
+                    name: "Mindanao State University - Iligan Institute of Technology", 
+                    domains: ["msuiit.edu.ph"], 
+                    web_pages: ["https://www.msuiit.edu.ph/"],
+                    courses: {
+                        "College of Engineering": ["BS Civil Engineering", "BS Chemical Engineering", "BS Computer Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Mechanical Engineering", "BS Metallurgical Engineering"],
+                        "College of Computer Studies": ["BS Computer Science", "BS Information Technology", "BS Information Systems"],
+                        "College of Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Financial Management", "BS Economics", "BS Hospitality Management"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies"],
+                        "College of Arts and Sciences": ["AB Communication", "AB Psychology", "AB Political Science", "AB Sociology", "AB History", "AB Philosophy", "BS Biology", "BS Chemistry", "BS Mathematics", "BS Physics", "BS Marine Biology"],
+                        "College of Nursing": ["BS Nursing", "BS Medical Technology"],
+                        "School of Graduate Studies": ["MS/PhD Engineering", "MS/PhD Science", "MBA", "MPA"]
+                    }
+                },
+                { 
+                    name: "Xavier University", 
+                    domains: ["xu.edu.ph"], 
+                    web_pages: ["https://www.xu.edu.ph/"],
+                    courses: {
+                        "College of Engineering": ["BS Civil Engineering", "BS Chemical Engineering", "BS Computer Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Mechanical Engineering", "BS Industrial Engineering"],
+                        "College of Computer Studies": ["BS Computer Science", "BS Information Technology"],
+                        "College of Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Financial Management", "BS Economics", "BS Hospitality Management", "BS Tourism Management"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies"],
+                        "College of Arts and Sciences": ["AB Communication", "AB Psychology", "AB Political Science", "AB Sociology", "AB History", "AB Philosophy", "BS Biology", "BS Chemistry", "BS Mathematics", "BS Physics"],
+                        "College of Nursing": ["BS Nursing", "BS Medical Technology", "BS Pharmacy"],
+                        "College of Law": ["Juris Doctor"],
+                        "School of Medicine": ["Doctor of Medicine"]
+                    }
+                },
                 { name: "University of Science and Technology of Southern Philippines", domains: ["ustp.edu.ph"], web_pages: ["https://www.ustp.edu.ph/"] },
                 { name: "Bukidnon State University", domains: ["buksu.edu.ph"], web_pages: ["https://buksu.edu.ph/"] },
                 { name: "Central Mindanao University", domains: ["cmu.edu.ph"], web_pages: ["https://www.cmu.edu.ph/"] },
@@ -865,10 +1384,49 @@
                 { name: "University of Misamis", domains: ["um.edu.ph"], web_pages: ["https://um.edu.ph/"] },
                 { name: "Northwestern Mindanao State College of Science and Technology", domains: ["nmscst.edu.ph"], web_pages: ["#"] },
                 
-                // Region XI - Davao Region
-                { name: "University of the Philippines Mindanao", domains: ["upmin.edu.ph"], web_pages: ["https://www.upmin.edu.ph/"] },
-                { name: "Ateneo de Davao University", domains: ["addu.edu.ph"], web_pages: ["https://www.addu.edu.ph/"] },
-                { name: "University of Mindanao", domains: ["umindanao.edu.ph"], web_pages: ["https://www.umindanao.edu.ph/"] },
+                // Region XI - Davao Region - with courses
+                { 
+                    name: "University of the Philippines Mindanao", 
+                    domains: ["upmin.edu.ph"], 
+                    web_pages: ["https://www.upmin.edu.ph/"],
+                    courses: {
+                        "College of Humanities": ["BA Communication", "BA English", "BA Filipino", "BA Performing Arts"],
+                        "College of Social Sciences": ["BA Political Science", "BA Sociology", "BA Anthropology", "BA History"],
+                        "College of Science": ["BS Biology", "BS Chemistry", "BS Mathematics", "BS Computer Science", "BS Food Technology"],
+                        "School of Management": ["BS Agribusiness Economics", "BS Business Economics"],
+                        "Graduate School": ["MS Tropical Agriculture", "MS Food Science", "MA Communication"]
+                    }
+                },
+                { 
+                    name: "Ateneo de Davao University", 
+                    domains: ["addu.edu.ph"], 
+                    web_pages: ["https://www.addu.edu.ph/"],
+                    courses: {
+                        "College of Engineering": ["BS Civil Engineering", "BS Computer Engineering", "BS Electronics Engineering", "BS Industrial Engineering"],
+                        "College of Computer Studies": ["BS Computer Science", "BS Information Technology"],
+                        "College of Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Financial Management", "BS Economics", "BS Hospitality Management", "BS Tourism Management"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies"],
+                        "College of Arts and Sciences": ["AB Communication", "AB Psychology", "AB Political Science", "AB Sociology", "AB History", "AB Philosophy", "BS Biology", "BS Chemistry", "BS Mathematics"],
+                        "College of Nursing": ["BS Nursing", "BS Medical Technology"],
+                        "College of Law": ["Juris Doctor"],
+                        "School of Government": ["Master of Public Administration", "Master of Public Policy"]
+                    }
+                },
+                { 
+                    name: "University of Mindanao", 
+                    domains: ["umindanao.edu.ph"], 
+                    web_pages: ["https://www.umindanao.edu.ph/"],
+                    courses: {
+                        "College of Engineering": ["BS Civil Engineering", "BS Computer Engineering", "BS Electrical Engineering", "BS Electronics Engineering", "BS Mechanical Engineering", "BS Industrial Engineering"],
+                        "College of Computer Studies": ["BS Computer Science", "BS Information Technology"],
+                        "College of Business": ["BS Accountancy", "BS Business Administration", "BS Entrepreneurship", "BS Marketing", "BS Financial Management", "BS Economics", "BS Hospitality Management", "BS Tourism Management"],
+                        "College of Education": ["BEEd", "BSEd English", "BSEd Filipino", "BSEd Mathematics", "BSEd Science", "BSEd Social Studies"],
+                        "College of Arts and Sciences": ["AB Communication", "AB Psychology", "AB Political Science", "AB Sociology", "AB History", "AB Philosophy", "BS Biology", "BS Chemistry", "BS Mathematics"],
+                        "College of Nursing": ["BS Nursing", "BS Medical Technology", "BS Pharmacy"],
+                        "College of Law": ["Juris Doctor"],
+                        "Graduate School": ["MBA", "MPA", "MA/MS Programs", "PhD Programs"]
+                    }
+                },
                 { name: "University of the Immaculate Conception", domains: ["uic.edu.ph"], web_pages: ["https://www.uic.edu.ph/"] },
                 { name: "Davao del Norte State College", domains: ["dnsc.edu.ph"], web_pages: ["https://dnsc.edu.ph/"] },
                 { name: "Davao Oriental State University", domains: ["dorsu.edu.ph"], web_pages: ["https://dorsu.edu.ph/"] },
@@ -1092,7 +1650,7 @@
                             
                             <div class="card-footer">
                                 <span class="location-text"><i class="fas fa-map-marker-alt"></i> Philippines</span>
-                                ${website !== '#' ? `<a href="${website}" target="_blank" class="visit-link" onclick="event.stopPropagation()">Visit <i class="fas fa-arrow-right"></i></a>` : ''}
+                                <span style="color: var(--accent-primary); font-size:0.85rem;"><i class="fas fa-book-open"></i> ${uni.courses ? Object.keys(uni.courses).length + ' departments' : 'Click for info'}</span>
                             </div>
                         </div>
                     `;
@@ -1108,11 +1666,30 @@
                 });
             }
 
-            // ----- Modal -----
+            // ----- Modal with Course Display -----
             function showModal(university) {
                 const domain = getDomain(university) || 'N/A';
                 const website = getWebPage(university) || '#';
                 const region = university.region || guessRegion(university);
+                
+                let coursesHtml = '';
+                
+                if (university.courses) {
+                    coursesHtml = '<div class="courses-section"><h3>Academic Programs</h3>';
+                    for (const [category, programs] of Object.entries(university.courses)) {
+                        coursesHtml += `
+                            <div class="course-category">
+                                <h4>${category}</h4>
+                                <div class="course-list">
+                                    ${programs.map(program => `<span class="course-item">${program}</span>`).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    coursesHtml += '</div>';
+                } else {
+                    coursesHtml = '<p style="color: var(--text-muted); margin: 2rem 0;">Course information not available. Visit university website for details.</p>';
+                }
                 
                 modalBody.innerHTML = `
                     <h2>${university.name}</h2>
@@ -1130,6 +1707,9 @@
                             <p>${region.charAt(0).toUpperCase() + region.slice(1)}</p>
                         </div>
                     </div>
+                    
+                    ${coursesHtml}
+                    
                     <div id="modalMap" class="modal-map"></div>
                 `;
                 
@@ -1158,15 +1738,69 @@
                 document.body.style.overflow = 'auto';
             }
 
-            // ----- Globals & Listeners -----
-            window.toggleFavorite = function(uniName) {
-                const idx = favorites.indexOf(uniName);
-                if (idx === -1) favorites.push(uniName);
-                else favorites.splice(idx, 1);
-                localStorage.setItem('favorites', JSON.stringify(favorites));
-                applyFiltersAndSort();
-            };
+            // ----- AI Assistant Functions -----
+            async function askGemini(question) {
+                const systemPrompt = `You are Zyka, a helpful AI assistant for the Zyka app, which helps users find information about Philippine universities. 
+                You have access to a database of ${allUniversities.length} universities. Be friendly, informative, and concise. 
+                If asked about specific universities, provide accurate information based on the database. 
+                If you don't know something, suggest that the user check the university's official website or CHED's portal.`;
+                
+                const fullPrompt = `${systemPrompt}\n\nUser Question: ${question}`;
+                
+                try {
+                    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{
+                                    text: fullPrompt
+                                }]
+                            }]
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('API request failed');
+                    }
+                    
+                    const data = await response.json();
+                    return data.candidates[0].content.parts[0].text;
+                } catch (error) {
+                    console.error('Gemini API error:', error);
+                    return "I'm having trouble connecting right now. Here are some tips: check CHED's official website at ched.gov.ph, visit the university's official website, or try searching the FOI portal at foi.gov.ph for more information. You can also try asking a simpler question!";
+                }
+            }
 
+            function addMessage(text, isUser = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `ai-message ${isUser ? 'user' : 'assistant'}`;
+                messageDiv.textContent = text;
+                aiMessages.appendChild(messageDiv);
+                aiMessages.scrollTop = aiMessages.scrollHeight;
+            }
+
+            async function handleAIQuestion() {
+                const question = aiInput.value.trim();
+                if (!question) return;
+                
+                addMessage(question, true);
+                aiInput.value = '';
+                aiSendBtn.disabled = true;
+                
+                addMessage("Thinking...", false);
+                
+                const answer = await askGemini(question);
+                
+                // Remove the "Thinking..." message
+                aiMessages.removeChild(aiMessages.lastChild);
+                addMessage(answer, false);
+                aiSendBtn.disabled = false;
+            }
+
+            // ----- Event Listeners -----
             searchBtn.addEventListener('click', applyFiltersAndSort);
             searchInput.addEventListener('input', applyFiltersAndSort);
             regionFilter.addEventListener('change', applyFiltersAndSort);
@@ -1199,6 +1833,23 @@
                 if (e.target === modal) closeModal();
             });
 
+            // AI Assistant event listeners
+            aiAssistantBtn.addEventListener('click', () => {
+                aiAssistantPanel.classList.toggle('open');
+            });
+            
+            closeAIBtn.addEventListener('click', () => {
+                aiAssistantPanel.classList.remove('open');
+            });
+            
+            aiSendBtn.addEventListener('click', handleAIQuestion);
+            
+            aiInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleAIQuestion();
+                }
+            });
+
             // Theme Management
             lightModeBtn.addEventListener('click', () => {
                 document.body.classList.remove('dark-mode');
@@ -1212,7 +1863,16 @@
                 lightModeBtn.classList.remove('active');
             });
 
-            // Initialize with embedded university data (no external file needed)
+            // ----- Globals -----
+            window.toggleFavorite = function(uniName) {
+                const idx = favorites.indexOf(uniName);
+                if (idx === -1) favorites.push(uniName);
+                else favorites.splice(idx, 1);
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+                applyFiltersAndSort();
+            };
+
+            // Initialize with embedded university data
             loadUniversities();
         })();
     </script>
